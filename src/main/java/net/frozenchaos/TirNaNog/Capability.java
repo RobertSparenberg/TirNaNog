@@ -2,17 +2,26 @@ package net.frozenchaos.TirNaNog;
 
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Id;
 import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 
 @Entity
 @Table(name = "capabilities")
-public abstract class Capability {
+public class Capability {
     private final ModuleConfig owningModule;
+
+    @Id
+    @Column(nullable = false, updatable = false)
     @XmlElement
     private final String name;
+
+    @Column(nullable = false, updatable = false)
     private final boolean consumer;
+
+    @Column(nullable = false, updatable = false)
     private final boolean producer;
 
     public Capability(ModuleConfig owningModule, String name, boolean consumer, boolean producer) {

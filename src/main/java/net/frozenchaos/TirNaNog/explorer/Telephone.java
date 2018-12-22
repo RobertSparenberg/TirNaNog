@@ -90,6 +90,7 @@ public class Telephone {
                 }
                 ModuleConfig moduleConfig = JAXB.unmarshal(stringBuilder.toString(), ModuleConfig.class);
                 moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
+                logger.trace("received phonecall", moduleConfig);
                 moduleConfigRepository.save(moduleConfig);
             } catch(SocketTimeoutException ignored) {
             } catch(IOException e) {

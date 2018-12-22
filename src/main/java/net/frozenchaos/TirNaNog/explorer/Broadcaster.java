@@ -85,6 +85,7 @@ public class Broadcaster {
                     ModuleConfig moduleConfig = JAXB.unmarshal(new String(buffer), ModuleConfig.class);
                     moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
                     moduleConfig = moduleConfigRepository.save(moduleConfig);
+                    logger.trace("received broadcast", receivedBroadcast);
                     telephone.addContactToRing(moduleConfig);
                 }
             }
