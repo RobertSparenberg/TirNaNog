@@ -35,8 +35,7 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
         if(!this.started) {
             logger.info("Initializing TirNaNog device explorer");
             try {
-
-                telephone = new Telephone();
+                telephone = new Telephone(moduleConfigRepository, timer);
                 broadcaster = new Broadcaster(moduleConfigRepository, timer, telephone);
                 this.started = true;
                 logger.info("ITirNaNog device explorer started");
@@ -49,6 +48,7 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
                     broadcaster.destroyGracefully();
                 }
             }
+            logger.info("TirNaNog device explorer initialized");
         }
     }
 }

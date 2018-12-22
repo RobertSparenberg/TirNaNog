@@ -30,8 +30,11 @@ public class Timer implements Runnable {
 
     public void addTask(ScheduledTask task) {
         logger.debug("Adding task to Timer");
+        task.reset();
         synchronized(tasks) {
-            tasks.add(task);
+            if(!tasks.contains(task)) {
+                tasks.add(task);
+            }
         }
         thread.interrupt();
     }

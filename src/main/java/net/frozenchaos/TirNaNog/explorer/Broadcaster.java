@@ -14,7 +14,6 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.List;
 
 /*
 The broadcaster is responsible for letting the TirNaNog network know about this module and what its IP is.
@@ -22,11 +21,10 @@ Each other module is responsible for ringing this module with the Telephone clas
  */
 public class Broadcaster {
     private static final int BROADCAST_PORT = 42001;
-    private static final int REBROADCAST_DELAY = 40000;
+    private static final int REBROADCAST_DELAY = 41000;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
-    private final Timer timer;
     private final Telephone telephone;
 
     private final byte[] marshaledOwnConfig;
@@ -39,7 +37,6 @@ public class Broadcaster {
 
     public Broadcaster(ModuleConfigRepository moduleConfigRepository, Timer timer, Telephone telephone) throws IOException, JAXBException {
         this.moduleConfigRepository = moduleConfigRepository;
-        this.timer = timer;
         this.telephone = telephone;
 
         broadcastSocket = new DatagramSocket(BROADCAST_PORT);
@@ -49,26 +46,24 @@ public class Broadcaster {
 
         listenSocket = new DatagramSocket(BROADCAST_PORT);
         listenSocket.setReuseAddress(true);
-        listenThread = new Thread(() -> receiveBroadcast());
+        listenThread = new Thread(this::receiveBroadcast);
         listenThread.run();
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
         ownConfig.setIp(broadcastSocket.getLocalAddress().toString());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-
         JAXB.marshal(ownConfig, outputStream);
-        marshaledOwnConfig = outputStream.toByteArray();
+        this.marshaledOwnConfig = outputStream.toByteArray();
 
         ScheduledTask broadcastTask = new ScheduledTask(REBROADCAST_DELAY) {
             @Override
             public void doTask() {
                 try {
-                    if(findOutdatedModules()) {
-                        timer.addTask(this);
-                    }
-                    //no other modules have outdated config regarding this module, stop broadcasting
+                    findOtherModules();
                 } catch(IOException e) {
                     logger.debug("Error during broadcast", e);
+                }
+                if(!stopRequested) {
                     timer.addTask(this);
                 }
             }
@@ -84,6 +79,8 @@ public class Broadcaster {
                 listenSocket.receive(receivedBroadcast);
                 if(!stopRequested) {
                     ModuleConfig moduleConfig = JAXB.unmarshal(new String(buffer), ModuleConfig.class);
+                    moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
+                    moduleConfig = moduleConfigRepository.save(moduleConfig);
                     telephone.addContactToRing(moduleConfig);
                 }
             }
@@ -92,15 +89,10 @@ public class Broadcaster {
         }
     }
 
-    public boolean findOutdatedModules() throws IOException {
-        List<ModuleConfig> outdatedModules = moduleConfigRepository.findConfigsThatDontKnowMeBySuppliedIp(broadcastSocket.getLocalAddress().toString());
-        if(outdatedModules != null && !outdatedModules.isEmpty()) {
-            DatagramPacket packet = new DatagramPacket(marshaledOwnConfig, marshaledOwnConfig.length, broadcastAddress, BROADCAST_PORT);
-            broadcastSocket.send(packet);
-            broadcastSocket.close();
-            return true;
-        }
-        return false;
+    public void findOtherModules() throws IOException {
+        DatagramPacket packet = new DatagramPacket(marshaledOwnConfig, marshaledOwnConfig.length, broadcastAddress, BROADCAST_PORT);
+        broadcastSocket.send(packet);
+        broadcastSocket.close();
     }
 
     public void destroyGracefully() {

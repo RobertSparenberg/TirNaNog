@@ -9,6 +9,6 @@ public interface ModuleConfigRepository extends CrudRepository<ModuleConfig, Int
     public ModuleConfig findByName(String name);
     public ModuleConfig findByIp(String ip);
 
-    @Query("SELECT config FROM ModuleConfig config WHERE config.ip != 'localhost' AND config.knowsMeByIp != ?1")
-    public List<ModuleConfig> findConfigsThatDontKnowMeBySuppliedIp(String ip);
+    @Query("SELECT config FROM ModuleConfig config WHERE config.ip != 'localhost'")
+    public List<ModuleConfig> findOtherConfigs();
 }

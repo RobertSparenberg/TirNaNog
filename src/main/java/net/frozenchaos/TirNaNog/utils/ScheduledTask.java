@@ -1,15 +1,18 @@
 package net.frozenchaos.TirNaNog.utils;
 
 public abstract class ScheduledTask {
+    private int initialDelay;
     private int delay;
     private boolean noLongerNeeded = false;
 
     protected ScheduledTask(int millisecondsBeforeExecution) {
-        this.delay = millisecondsBeforeExecution;
+        this.initialDelay = millisecondsBeforeExecution;
+        this.delay = this.initialDelay;
     }
 
     public void setDelay(int millisecondsBeforeExecution) {
-        this.delay = millisecondsBeforeExecution;
+        this.initialDelay = millisecondsBeforeExecution;
+        this.delay = this.initialDelay;
     }
 
     public void setNoLongerNeeded() {
@@ -30,6 +33,11 @@ public abstract class ScheduledTask {
 
     boolean isNoLongerNeeded() {
         return this.noLongerNeeded;
+    }
+
+    void reset() {
+        this.noLongerNeeded = false;
+        this.delay = this.initialDelay;
     }
 
     public abstract void doTask();

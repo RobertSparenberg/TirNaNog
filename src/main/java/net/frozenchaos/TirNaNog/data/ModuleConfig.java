@@ -21,27 +21,27 @@ public class ModuleConfig implements Serializable {
     private String ip;
 
     @Column(nullable = false, updatable = true)
-    private String knowsMeByIp;
+    private long lastMessageTimestamp;
 
     @Column(nullable = false, updatable = true)
     @XmlElement
-    private boolean isActuator;
+    private boolean isConsumer;
 
     @Column(nullable = false, updatable = true)
     @XmlElement
-    private boolean isSensor;
+    private boolean isProducer;
 
     @Column(nullable = false, updatable = true)
     @XmlElement
-    private boolean isDumb;
+    private boolean hardwareInterfaceOnly;
 
-    public ModuleConfig(String name, String ip, String knowsMeByIp, boolean isActuator, boolean isSensor, boolean isDumb) {
+    public ModuleConfig(String name, String ip, boolean isConsumer, boolean isProducer, boolean hardwareInterfaceOnly) {
         this.name = name;
         this.ip = ip;
-        this.knowsMeByIp = knowsMeByIp;
-        this.isActuator = isActuator;
-        this.isSensor = isSensor;
-        this.isDumb = isDumb;
+        this.isConsumer = isConsumer;
+        this.isProducer = isProducer;
+        this.hardwareInterfaceOnly = hardwareInterfaceOnly;
+        this.lastMessageTimestamp = -1;
     }
 
     /**
@@ -62,35 +62,52 @@ public class ModuleConfig implements Serializable {
         this.ip = ip;
     }
 
-    public String getKnowsMeByIp() {
-        return knowsMeByIp;
+    public long getLastMessageTimestamp() {
+        return lastMessageTimestamp;
     }
 
-    public void setKnowsMeByIp(String knowsMeByIp) {
-        this.knowsMeByIp = knowsMeByIp;
+    public void setLastMessageTimestamp(long lastMessageTimestamp) {
+        this.lastMessageTimestamp = lastMessageTimestamp;
     }
 
-    public boolean isActuator() {
-        return isActuator;
+    public boolean isConsumer() {
+        return isConsumer;
     }
 
-    public void setActuator(boolean isActuator) {
-        this.isActuator = isActuator;
+    public void setConsumer(boolean isActuator) {
+        this.isConsumer = isActuator;
     }
 
-    public boolean isSensor() {
-        return isSensor;
+    public boolean isProducer() {
+        return isProducer;
     }
 
-    public void setSensor(boolean isSensor) {
-        this.isSensor = isSensor;
+    public void setProducer(boolean isSensor) {
+        this.isProducer = isSensor;
     }
 
-    public boolean isDumb() {
-        return isDumb;
+    public boolean isHardwareInterfaceOnly() {
+        return hardwareInterfaceOnly;
     }
 
-    public void setDumb(boolean isDumb) {
-        this.isDumb = isDumb;
+    public void setHardwareInterfaceOnly(boolean isDumb) {
+        this.hardwareInterfaceOnly = isDumb;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) return true;
+        if(!(o instanceof ModuleConfig)) return false;
+
+        ModuleConfig that = (ModuleConfig) o;
+
+        if(!name.equals(that.name)) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        return name.hashCode();
     }
 }
