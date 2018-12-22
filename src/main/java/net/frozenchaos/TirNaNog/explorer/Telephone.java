@@ -1,5 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
+import net.frozenchaos.TirNaNog.Capability;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
@@ -16,6 +17,7 @@ import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
+import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedDeque;
 
@@ -44,7 +46,7 @@ public class Telephone {
 
     private boolean stopRequested = false;
 
-    public Telephone(ModuleConfigRepository moduleConfigRepository, Timer timer) throws IOException {
+    public Telephone(ModuleConfigRepository moduleConfigRepository, Timer timer, List<Capability> ownCapabilities) throws IOException {
         this.moduleConfigRepository = moduleConfigRepository;
         this.scheduledCalls = new ConcurrentLinkedDeque<>();
         this.serverSocket = new ServerSocket(TELEPHONE_PORT);
@@ -53,6 +55,8 @@ public class Telephone {
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
         ownConfig.setIp(serverSocket.getInetAddress().getHostAddress());
+        ownConfig.getCapabilities().clear();
+        ownConfig.getCapabilities().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         JAXB.marshal(ownConfig, outputStream);
         this.marshaledOwnConfig = outputStream.toByteArray();

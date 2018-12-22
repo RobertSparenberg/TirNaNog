@@ -1,12 +1,13 @@
 package net.frozenchaos.TirNaNog.data;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import net.frozenchaos.TirNaNog.Capability;
+
+import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name = "module_config")
@@ -14,7 +15,6 @@ import java.io.Serializable;
 public class ModuleConfig implements Serializable {
     @Id
     @Column(nullable = false, updatable = false)
-    @XmlElement
     private String name;
 
     @Column(nullable = false, updatable = true)
@@ -24,24 +24,17 @@ public class ModuleConfig implements Serializable {
     private long lastMessageTimestamp;
 
     @Column(nullable = false, updatable = true)
-    @XmlElement
-    private boolean isConsumer;
-
-    @Column(nullable = false, updatable = true)
-    @XmlElement
-    private boolean isProducer;
-
-    @Column(nullable = false, updatable = true)
-    @XmlElement
     private boolean hardwareInterfaceOnly;
 
-    public ModuleConfig(String name, String ip, boolean isConsumer, boolean isProducer, boolean hardwareInterfaceOnly) {
+    @OneToMany
+    private List<Capability> capabilities = new ArrayList<>();
+
+    public ModuleConfig(String name, String ip, boolean hardwareInterfaceOnly, List<Capability> capabilities) {
         this.name = name;
         this.ip = ip;
-        this.isConsumer = isConsumer;
-        this.isProducer = isProducer;
         this.hardwareInterfaceOnly = hardwareInterfaceOnly;
         this.lastMessageTimestamp = -1;
+        this.capabilities.addAll(capabilities);
     }
 
     /**
@@ -50,6 +43,7 @@ public class ModuleConfig implements Serializable {
     public ModuleConfig() {
     }
 
+    @XmlElement(name="name")
     public String getName() {
         return name;
     }
@@ -70,28 +64,18 @@ public class ModuleConfig implements Serializable {
         this.lastMessageTimestamp = lastMessageTimestamp;
     }
 
-    public boolean isConsumer() {
-        return isConsumer;
-    }
-
-    public void setConsumer(boolean isActuator) {
-        this.isConsumer = isActuator;
-    }
-
-    public boolean isProducer() {
-        return isProducer;
-    }
-
-    public void setProducer(boolean isSensor) {
-        this.isProducer = isSensor;
-    }
-
+    @XmlElement(name="interface_only")
     public boolean isHardwareInterfaceOnly() {
         return hardwareInterfaceOnly;
     }
 
     public void setHardwareInterfaceOnly(boolean isDumb) {
         this.hardwareInterfaceOnly = isDumb;
+    }
+
+    @XmlElement(name="capabilities")
+    public List<Capability> getCapabilities() {
+        return capabilities;
     }
 
     @Override

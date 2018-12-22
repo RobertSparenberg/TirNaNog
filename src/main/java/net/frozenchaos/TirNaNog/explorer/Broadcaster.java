@@ -1,5 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
+import net.frozenchaos.TirNaNog.Capability;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
@@ -14,6 +15,7 @@ import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.List;
 
 /*
 The broadcaster is responsible for letting the TirNaNog network know about this module and what its IP is.
@@ -35,7 +37,7 @@ public class Broadcaster {
 
     private boolean stopRequested = false;
 
-    public Broadcaster(ModuleConfigRepository moduleConfigRepository, Timer timer, Telephone telephone) throws IOException, JAXBException {
+    public Broadcaster(ModuleConfigRepository moduleConfigRepository, Timer timer, Telephone telephone, List<Capability> ownCapabilities) throws IOException, JAXBException {
         this.moduleConfigRepository = moduleConfigRepository;
         this.telephone = telephone;
 
@@ -51,6 +53,8 @@ public class Broadcaster {
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
         ownConfig.setIp(broadcastSocket.getLocalAddress().toString());
+        ownConfig.getCapabilities().clear();
+        ownConfig.getCapabilities().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         JAXB.marshal(ownConfig, outputStream);
         this.marshaledOwnConfig = outputStream.toByteArray();
