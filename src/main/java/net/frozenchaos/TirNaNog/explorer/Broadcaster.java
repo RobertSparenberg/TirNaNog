@@ -52,7 +52,6 @@ public class Broadcaster {
         listenThread.run();
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
-        ownConfig.setIp(broadcastSocket.getLocalAddress().toString());
         ownConfig.getCapabilities().clear();
         ownConfig.getCapabilities().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -84,6 +83,8 @@ public class Broadcaster {
                 if(!stopRequested) {
                     ModuleConfig moduleConfig = JAXB.unmarshal(new String(buffer), ModuleConfig.class);
                     moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
+                    moduleConfig.setIp(receivedBroadcast.getAddress().getHostAddress());
+                    logger.trace("broadcaster received broadcast from: " + moduleConfig.getIp());
                     moduleConfig = moduleConfigRepository.save(moduleConfig);
                     logger.trace("received broadcast", receivedBroadcast);
                     telephone.addContactToRing(moduleConfig);

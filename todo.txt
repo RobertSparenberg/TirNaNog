@@ -1,0 +1,6 @@
+Todo list:
+- cascade updates of the main TirNaNog jar and DB scripts
+- DB script update mechanism (liquibase integrates with spring boot)
+- settings propagation throughout the system
+- pull in dependency jars to separate TirNaNog from specific device logic
+- specific CatCoop logic

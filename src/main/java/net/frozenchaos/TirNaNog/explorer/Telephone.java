@@ -54,7 +54,6 @@ public class Telephone {
         this.clientSocket.setSoTimeout(SOCKET_TIMEOUT);
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
-        ownConfig.setIp(serverSocket.getInetAddress().getHostAddress());
         ownConfig.getCapabilities().clear();
         ownConfig.getCapabilities().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -90,6 +89,8 @@ public class Telephone {
                 }
                 ModuleConfig moduleConfig = JAXB.unmarshal(stringBuilder.toString(), ModuleConfig.class);
                 moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
+                moduleConfig.setIp(socket.getInetAddress().toString());
+                logger.trace("telephone received call from: " + moduleConfig.getIp());
                 logger.trace("received phonecall", moduleConfig);
                 moduleConfigRepository.save(moduleConfig);
             } catch(SocketTimeoutException ignored) {

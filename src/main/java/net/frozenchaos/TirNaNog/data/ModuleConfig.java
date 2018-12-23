@@ -26,7 +26,7 @@ public class ModuleConfig implements Serializable {
     @Column(nullable = false, updatable = true)
     private boolean hardwareInterfaceOnly;
 
-    @OneToMany
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "owningModule")
     private List<Capability> capabilities = new ArrayList<>();
 
     public ModuleConfig(String name, String ip, boolean hardwareInterfaceOnly, List<Capability> capabilities) {

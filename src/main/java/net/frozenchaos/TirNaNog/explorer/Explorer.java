@@ -31,9 +31,14 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Autowired
-    public Explorer(ModuleConfigRepository moduleConfigRepository, Timer timer, List<Capability> ownCapabilities) {
+    public Explorer(ModuleConfigRepository moduleConfigRepository, Timer timer) {//, List<Capability> ownCapabilities) {
         this.moduleConfigRepository = moduleConfigRepository;
         this.timer = timer;
+        //this.ownCapabilities.addAll(ownCapabilities);
+    }
+
+    @Autowired(required = false)
+    public void setOwnCapabilities(List<Capability> ownCapabilities) {
         this.ownCapabilities.addAll(ownCapabilities);
     }
 
@@ -45,7 +50,7 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
                 telephone = new Telephone(moduleConfigRepository, timer, ownCapabilities);
                 broadcaster = new Broadcaster(moduleConfigRepository, timer, telephone, ownCapabilities);
                 this.started = true;
-                logger.info("ITirNaNog device explorer started");
+                logger.info("TirNaNog device explorer initialized");
             } catch(Exception e) {
                 logger.error("Error initializing the TirNaNog device Explorer, shutting down the explorer", e);
                 if(telephone != null) {
@@ -55,7 +60,6 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
                     broadcaster.destroyGracefully();
                 }
             }
-            logger.info("TirNaNog device explorer initialized");
         }
     }
 }
