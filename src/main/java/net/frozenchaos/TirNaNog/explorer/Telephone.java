@@ -9,10 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXB;
-import java.io.BufferedReader;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -43,10 +40,12 @@ public class Telephone {
 
     private final Thread inboundThread;
     private final byte[] marshaledOwnConfig;
+    private final String ownName;
 
     private boolean stopRequested = false;
 
     public Telephone(ModuleConfigRepository moduleConfigRepository, Timer timer, List<Capability> ownCapabilities) throws IOException {
+        logger.trace("Telephone Initializing");
         this.moduleConfigRepository = moduleConfigRepository;
         this.scheduledCalls = new ConcurrentLinkedDeque<>();
         this.serverSocket = new ServerSocket(TELEPHONE_PORT);
@@ -54,6 +53,7 @@ public class Telephone {
         this.clientSocket.setSoTimeout(SOCKET_TIMEOUT);
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
+        this.ownName = ownConfig.getName();
         ownConfig.getCapabilities().clear();
         ownConfig.getCapabilities().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
@@ -61,6 +61,8 @@ public class Telephone {
         this.marshaledOwnConfig = outputStream.toByteArray();
 
         this.inboundThread = new Thread(this::receiveCall);
+        this.inboundThread.start();
+
         ScheduledTask outboundCallTask = new ScheduledTask(DELAY_BETWEEN_CALLS) {
             @Override
             public void doTask() {
@@ -75,6 +77,7 @@ public class Telephone {
             }
         };
         timer.addTask(outboundCallTask);
+        logger.trace("Telephone initialized");
     }
 
     private void receiveCall() {
@@ -87,14 +90,17 @@ public class Telephone {
                 while((line = reader.readLine()) != null) {
                     stringBuilder.append(line);
                 }
-                ModuleConfig moduleConfig = JAXB.unmarshal(stringBuilder.toString(), ModuleConfig.class);
-                moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
-                moduleConfig.setIp(socket.getInetAddress().toString());
-                logger.trace("telephone received call from: " + moduleConfig.getIp());
-                logger.trace("received phonecall", moduleConfig);
-                moduleConfigRepository.save(moduleConfig);
+                logger.trace("received telephone xml: " + stringBuilder.toString());
+                //todo: find a simpler way to unmarshall the string
+                ModuleConfig moduleConfig = JAXB.unmarshal(new StringReader(stringBuilder.toString().trim()), ModuleConfig.class);
+                if(!this.ownName.equals(moduleConfig.getName())) {
+                    moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
+                    moduleConfig.setIp(socket.getInetAddress().toString());
+                    logger.trace("Broadcaster saving moduleconfig: " + moduleConfig.toString());
+                    moduleConfigRepository.save(moduleConfig);
+                }
             } catch(SocketTimeoutException ignored) {
-            } catch(IOException e) {
+            } catch(Exception e) {
                 logger.error("Error accepting incoming socket", e);
             }
         }
@@ -103,6 +109,7 @@ public class Telephone {
     private void ringOtherModule() throws IOException {
         ModuleConfig moduleToRing = this.scheduledCalls.poll();
         if(moduleToRing != null) {
+            logger.trace("Telephone is ringing other module: " + moduleToRing.getIp());
             this.clientSocket.connect(new InetSocketAddress(moduleToRing.getIp(), TELEPHONE_PORT));
             this.clientSocket.getOutputStream().write(this.marshaledOwnConfig);
             this.clientSocket.close();

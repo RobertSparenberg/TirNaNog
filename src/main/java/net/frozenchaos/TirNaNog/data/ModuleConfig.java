@@ -48,6 +48,10 @@ public class ModuleConfig implements Serializable {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public String getIp() {
         return ip;
     }
@@ -64,7 +68,7 @@ public class ModuleConfig implements Serializable {
         this.lastMessageTimestamp = lastMessageTimestamp;
     }
 
-    @XmlElement(name="interface_only")
+    @XmlElement(name="hardware_interface_only")
     public boolean isHardwareInterfaceOnly() {
         return hardwareInterfaceOnly;
     }
@@ -76,6 +80,10 @@ public class ModuleConfig implements Serializable {
     @XmlElement(name="capabilities")
     public List<Capability> getCapabilities() {
         return capabilities;
+    }
+
+    public void setCapabilities(List<Capability> capabilities) {
+        this.capabilities.addAll(capabilities);
     }
 
     @Override
@@ -93,5 +101,15 @@ public class ModuleConfig implements Serializable {
     @Override
     public int hashCode() {
         return name.hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return "ModuleConfig{"+
+                "name='"+name+'\''+
+                ", ip='"+ip+'\''+
+                ", lastMessageTimestamp="+lastMessageTimestamp+
+                ", hardwareInterfaceOnly="+hardwareInterfaceOnly+
+                '}';
     }
 }

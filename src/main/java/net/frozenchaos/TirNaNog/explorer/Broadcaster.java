@@ -12,6 +12,7 @@ import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBException;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
@@ -30,6 +31,7 @@ public class Broadcaster {
     private final Telephone telephone;
 
     private final byte[] marshaledOwnConfig;
+    private final String ownName;
     private final DatagramSocket broadcastSocket;
     private final DatagramSocket listenSocket;
     private final InetAddress broadcastAddress;
@@ -38,32 +40,33 @@ public class Broadcaster {
     private boolean stopRequested = false;
 
     public Broadcaster(ModuleConfigRepository moduleConfigRepository, Timer timer, Telephone telephone, List<Capability> ownCapabilities) throws IOException, JAXBException {
+        logger.trace("Broadcaster initializing");
         this.moduleConfigRepository = moduleConfigRepository;
         this.telephone = telephone;
 
-        broadcastSocket = new DatagramSocket(BROADCAST_PORT);
-        broadcastSocket.setBroadcast(true);
-        broadcastSocket.setReuseAddress(true);
-        broadcastAddress = InetAddress.getByName("192.168.1.255");
-
-        listenSocket = new DatagramSocket(BROADCAST_PORT);
-        listenSocket.setReuseAddress(true);
-        listenThread = new Thread(this::receiveBroadcast);
-        listenThread.run();
+        this.broadcastSocket = new DatagramSocket();
+        this.broadcastSocket.setBroadcast(true);
+        this.broadcastSocket.setReuseAddress(true);
+        this.broadcastAddress = InetAddress.getByName("192.168.1.255");
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
+        this.ownName = ownConfig.getName();
         ownConfig.getCapabilities().clear();
         ownConfig.getCapabilities().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         JAXB.marshal(ownConfig, outputStream);
         this.marshaledOwnConfig = outputStream.toByteArray();
 
+        this.listenSocket = new DatagramSocket(BROADCAST_PORT);
+        this.listenThread = new Thread(this::receiveBroadcast);
+        this.listenThread.start();
+
         ScheduledTask broadcastTask = new ScheduledTask(REBROADCAST_DELAY) {
             @Override
             public void doTask() {
                 try {
                     findOtherModules();
-                } catch(IOException e) {
+                } catch(Exception e) {
                     logger.debug("Error during broadcast", e);
                 }
                 if(!stopRequested) {
@@ -72,40 +75,44 @@ public class Broadcaster {
             }
         };
         timer.addTask(broadcastTask);
+        logger.trace("Broadcaster initialized");
     }
 
     private void receiveBroadcast() {
-        try {
-            byte[] buffer = new byte[1024];
-            DatagramPacket receivedBroadcast = new DatagramPacket(buffer, buffer.length);
-            while(!stopRequested) {
-                listenSocket.receive(receivedBroadcast);
+        while(!stopRequested) {
+            try {
+                byte[] buffer = new byte[1024];
+                DatagramPacket receivedBroadcast = new DatagramPacket(buffer, buffer.length);
+                this.listenSocket.receive(receivedBroadcast);
                 if(!stopRequested) {
-                    ModuleConfig moduleConfig = JAXB.unmarshal(new String(buffer), ModuleConfig.class);
-                    moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
-                    moduleConfig.setIp(receivedBroadcast.getAddress().getHostAddress());
-                    logger.trace("broadcaster received broadcast from: " + moduleConfig.getIp());
-                    moduleConfig = moduleConfigRepository.save(moduleConfig);
-                    logger.trace("received broadcast", receivedBroadcast);
-                    telephone.addContactToRing(moduleConfig);
+                    //todo: find a simpler way to unmarshall the string
+                    ModuleConfig moduleConfig = JAXB.unmarshal(new StringReader(new String(buffer).trim()), ModuleConfig.class);
+                    if(!this.ownName.equals(moduleConfig.getName())) {
+                        moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
+                        moduleConfig.setIp(receivedBroadcast.getAddress().getHostAddress());
+                        logger.trace("Broadcaster saving moduleconfig: " + moduleConfig.toString());
+                        moduleConfig = moduleConfigRepository.save(moduleConfig);
+                        this.telephone.addContactToRing(moduleConfig);
+                    }
                 }
+            } catch(Exception e) {
+                this.logger.error("Error receiving broadcast from another module", e);
             }
-        } catch(IOException e) {
-            logger.error("Error receiving broadcast from another modules", e);
         }
     }
 
     public void findOtherModules() throws IOException {
         DatagramPacket packet = new DatagramPacket(marshaledOwnConfig, marshaledOwnConfig.length, broadcastAddress, BROADCAST_PORT);
-        broadcastSocket.send(packet);
-        broadcastSocket.close();
+        this.broadcastSocket.send(packet);
+        this.logger.trace("Sending broacast");
+        this.broadcastSocket.close();
     }
 
     public void destroyGracefully() {
         this.stopRequested = true;
 
-        broadcastSocket.close();
-        listenThread.interrupt();
-        listenSocket.close();
+        this.broadcastSocket.close();
+        this.listenThread.interrupt();
+        this.listenSocket.close();
     }
 }
