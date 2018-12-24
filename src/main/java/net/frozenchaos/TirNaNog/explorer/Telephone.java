@@ -1,6 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.Capability;
+import net.frozenchaos.TirNaNog.data.Capability;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
@@ -34,7 +34,7 @@ public class Telephone {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
-    private final Queue<ModuleConfig> scheduledCalls;
+    private final Queue<ModuleConfig> scheduledCalls = new ConcurrentLinkedDeque<>();
     private final ServerSocket serverSocket;
     private final Socket clientSocket;
 
@@ -47,10 +47,9 @@ public class Telephone {
     public Telephone(ModuleConfigRepository moduleConfigRepository, Timer timer, List<Capability> ownCapabilities) throws IOException {
         logger.trace("Telephone Initializing");
         this.moduleConfigRepository = moduleConfigRepository;
-        this.scheduledCalls = new ConcurrentLinkedDeque<>();
-        this.serverSocket = new ServerSocket(TELEPHONE_PORT);
-        this.clientSocket = new Socket();
-        this.clientSocket.setSoTimeout(SOCKET_TIMEOUT);
+        serverSocket = new ServerSocket(TELEPHONE_PORT);
+        clientSocket = new Socket();
+        clientSocket.setSoTimeout(SOCKET_TIMEOUT);
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
         this.ownName = ownConfig.getName();
@@ -58,10 +57,10 @@ public class Telephone {
         ownConfig.getCapabilities().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         JAXB.marshal(ownConfig, outputStream);
-        this.marshaledOwnConfig = outputStream.toByteArray();
+        marshaledOwnConfig = outputStream.toByteArray();
 
-        this.inboundThread = new Thread(this::receiveCall);
-        this.inboundThread.start();
+        inboundThread = new Thread(this::receiveCall);
+        inboundThread.start();
 
         ScheduledTask outboundCallTask = new ScheduledTask(DELAY_BETWEEN_CALLS) {
             @Override
@@ -93,7 +92,7 @@ public class Telephone {
                 logger.trace("received telephone xml: " + stringBuilder.toString());
                 //todo: find a simpler way to unmarshall the string
                 ModuleConfig moduleConfig = JAXB.unmarshal(new StringReader(stringBuilder.toString().trim()), ModuleConfig.class);
-                if(!this.ownName.equals(moduleConfig.getName())) {
+                if(!ownName.equals(moduleConfig.getName())) {
                     moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
                     moduleConfig.setIp(socket.getInetAddress().toString());
                     logger.trace("Broadcaster saving moduleconfig: " + moduleConfig.toString());
@@ -107,28 +106,28 @@ public class Telephone {
     }
 
     private void ringOtherModule() throws IOException {
-        ModuleConfig moduleToRing = this.scheduledCalls.poll();
+        ModuleConfig moduleToRing = scheduledCalls.poll();
         if(moduleToRing != null) {
             logger.trace("Telephone is ringing other module: " + moduleToRing.getIp());
-            this.clientSocket.connect(new InetSocketAddress(moduleToRing.getIp(), TELEPHONE_PORT));
-            this.clientSocket.getOutputStream().write(this.marshaledOwnConfig);
-            this.clientSocket.close();
+            clientSocket.connect(new InetSocketAddress(moduleToRing.getIp(), TELEPHONE_PORT));
+            clientSocket.getOutputStream().write(marshaledOwnConfig);
+            clientSocket.close();
         }
     }
 
     public void destroyGracefully() {
         this.stopRequested = true;
         try {
-            this.serverSocket.close();
+            serverSocket.close();
         } catch(Exception ignored) {
         }
         try {
-            this.inboundThread.join(SOCKET_TIMEOUT+1000);
+            inboundThread.join(SOCKET_TIMEOUT+1000);
         } catch(Exception ignored) {
         }
     }
 
     public void addContactToRing(ModuleConfig moduleConfig) {
-        this.scheduledCalls.add(moduleConfig);
+        scheduledCalls.add(moduleConfig);
     }
 }

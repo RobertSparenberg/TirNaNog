@@ -1,6 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.Capability;
+import net.frozenchaos.TirNaNog.data.Capability;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
@@ -44,22 +44,22 @@ public class Broadcaster {
         this.moduleConfigRepository = moduleConfigRepository;
         this.telephone = telephone;
 
-        this.broadcastSocket = new DatagramSocket();
-        this.broadcastSocket.setBroadcast(true);
-        this.broadcastSocket.setReuseAddress(true);
-        this.broadcastAddress = InetAddress.getByName("192.168.1.255");
+        broadcastSocket = new DatagramSocket();
+        broadcastSocket.setBroadcast(true);
+        broadcastSocket.setReuseAddress(true);
+        broadcastAddress = InetAddress.getByName("192.168.1.255");
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
-        this.ownName = ownConfig.getName();
+        ownName = ownConfig.getName();
         ownConfig.getCapabilities().clear();
         ownConfig.getCapabilities().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         JAXB.marshal(ownConfig, outputStream);
-        this.marshaledOwnConfig = outputStream.toByteArray();
+        marshaledOwnConfig = outputStream.toByteArray();
 
-        this.listenSocket = new DatagramSocket(BROADCAST_PORT);
-        this.listenThread = new Thread(this::receiveBroadcast);
-        this.listenThread.start();
+        listenSocket = new DatagramSocket(BROADCAST_PORT);
+        listenThread = new Thread(this::receiveBroadcast);
+        listenThread.start();
 
         ScheduledTask broadcastTask = new ScheduledTask(REBROADCAST_DELAY) {
             @Override
@@ -83,36 +83,36 @@ public class Broadcaster {
             try {
                 byte[] buffer = new byte[1024];
                 DatagramPacket receivedBroadcast = new DatagramPacket(buffer, buffer.length);
-                this.listenSocket.receive(receivedBroadcast);
+                listenSocket.receive(receivedBroadcast);
                 if(!stopRequested) {
                     //todo: find a simpler way to unmarshall the string
                     ModuleConfig moduleConfig = JAXB.unmarshal(new StringReader(new String(buffer).trim()), ModuleConfig.class);
                     if(!this.ownName.equals(moduleConfig.getName())) {
                         moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
                         moduleConfig.setIp(receivedBroadcast.getAddress().getHostAddress());
-                        logger.trace("Broadcaster saving moduleconfig: " + moduleConfig.toString());
+                        logger.trace("Broadcaster saving moduleconfig: "+moduleConfig.toString());
                         moduleConfig = moduleConfigRepository.save(moduleConfig);
-                        this.telephone.addContactToRing(moduleConfig);
+                        telephone.addContactToRing(moduleConfig);
                     }
                 }
             } catch(Exception e) {
-                this.logger.error("Error receiving broadcast from another module", e);
+                logger.error("Error receiving broadcast from another module", e);
             }
         }
     }
 
     public void findOtherModules() throws IOException {
         DatagramPacket packet = new DatagramPacket(marshaledOwnConfig, marshaledOwnConfig.length, broadcastAddress, BROADCAST_PORT);
-        this.broadcastSocket.send(packet);
-        this.logger.trace("Sending broacast");
-        this.broadcastSocket.close();
+        broadcastSocket.send(packet);
+        logger.trace("Sending broacast");
+        broadcastSocket.close();
     }
 
     public void destroyGracefully() {
-        this.stopRequested = true;
+        stopRequested = true;
 
-        this.broadcastSocket.close();
-        this.listenThread.interrupt();
-        this.listenSocket.close();
+        broadcastSocket.close();
+        listenThread.interrupt();
+        listenSocket.close();
     }
 }

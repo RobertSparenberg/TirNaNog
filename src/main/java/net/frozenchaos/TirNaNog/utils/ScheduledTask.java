@@ -6,17 +6,17 @@ public abstract class ScheduledTask {
     private boolean noLongerNeeded = false;
 
     protected ScheduledTask(int millisecondsBeforeExecution) {
-        this.initialDelay = millisecondsBeforeExecution;
-        this.delay = this.initialDelay;
+        initialDelay = millisecondsBeforeExecution;
+        delay = initialDelay;
     }
 
     public void setDelay(int millisecondsBeforeExecution) {
-        this.initialDelay = millisecondsBeforeExecution;
-        this.delay = this.initialDelay;
+        initialDelay = millisecondsBeforeExecution;
+        delay = initialDelay;
     }
 
     public void setNoLongerNeeded() {
-        this.noLongerNeeded = true;
+        noLongerNeeded = true;
     }
 
     int getDelay() {
@@ -24,20 +24,20 @@ public abstract class ScheduledTask {
     }
 
     void deductFromDelay(int milliSeconds) {
-        this.delay -= milliSeconds;
+        delay -= milliSeconds;
     }
 
     boolean isReadyForExecution() {
-        return this.delay <= 0;
+        return delay <= 0;
     }
 
     boolean isNoLongerNeeded() {
-        return this.noLongerNeeded;
+        return noLongerNeeded;
     }
 
     void reset() {
-        this.noLongerNeeded = false;
-        this.delay = this.initialDelay;
+        noLongerNeeded = false;
+        delay = initialDelay;
     }
 
     public abstract void doTask();

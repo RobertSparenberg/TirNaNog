@@ -1,6 +1,4 @@
-package net.frozenchaos.TirNaNog;
-
-import net.frozenchaos.TirNaNog.data.ModuleConfig;
+package net.frozenchaos.TirNaNog.data;
 
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;

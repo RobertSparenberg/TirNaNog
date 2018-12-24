@@ -1,6 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.Capability;
+import net.frozenchaos.TirNaNog.data.Capability;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.slf4j.Logger;
@@ -31,10 +31,9 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Autowired
-    public Explorer(ModuleConfigRepository moduleConfigRepository, Timer timer) {//, List<Capability> ownCapabilities) {
+    public Explorer(ModuleConfigRepository moduleConfigRepository, Timer timer) {
         this.moduleConfigRepository = moduleConfigRepository;
         this.timer = timer;
-        //this.ownCapabilities.addAll(ownCapabilities);
     }
 
     @Autowired(required = false)
@@ -49,7 +48,7 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
             try {
                 telephone = new Telephone(moduleConfigRepository, timer, ownCapabilities);
                 broadcaster = new Broadcaster(moduleConfigRepository, timer, telephone, ownCapabilities);
-                this.started = true;
+                started = true;
                 logger.info("TirNaNog device explorer initialized");
             } catch(Exception e) {
                 logger.error("Error initializing the TirNaNog device Explorer, shutting down the explorer", e);
