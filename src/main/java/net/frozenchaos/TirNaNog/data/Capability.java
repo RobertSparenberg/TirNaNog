@@ -3,6 +3,7 @@ package net.frozenchaos.TirNaNog.data;
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 
+//todo: replace this by using the CapabilityServer to get available capabilities
 @Entity
 @Table(name = "capabilities")
 public class Capability {
