@@ -1,5 +1,7 @@
 package net.frozenchaos.TirNaNog.data;
 
+import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
+
 import javax.persistence.*;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
@@ -25,14 +27,14 @@ public class ModuleConfig implements Serializable {
     private boolean hardwareInterfaceOnly;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "owningModule")
-    private List<Capability> capabilities = new ArrayList<>();
+    private List<CapabilityApplication> capabilityApplications = new ArrayList<>();
 
-    public ModuleConfig(String name, String ip, boolean hardwareInterfaceOnly, List<Capability> capabilities) {
+    public ModuleConfig(String name, String ip, boolean hardwareInterfaceOnly, List<CapabilityApplication> capabilityApplications) {
         this.name = name;
         this.ip = ip;
         this.hardwareInterfaceOnly = hardwareInterfaceOnly;
         this.lastMessageTimestamp = -1;
-        this.capabilities.addAll(capabilities);
+        this.capabilityApplications.addAll(capabilityApplications);
     }
 
     /**
@@ -75,13 +77,13 @@ public class ModuleConfig implements Serializable {
         this.hardwareInterfaceOnly = isDumb;
     }
 
-    @XmlElement(name="capabilities")
-    public List<Capability> getCapabilities() {
-        return capabilities;
+    @XmlElement(name="capability_applications")
+    public List<CapabilityApplication> getCapabilityApplications() {
+        return capabilityApplications;
     }
 
-    public void setCapabilities(List<Capability> capabilities) {
-        this.capabilities.addAll(capabilities);
+    public void setCapabilityApplications(List<CapabilityApplication> capabilityApplications) {
+        this.capabilityApplications.addAll(capabilityApplications);
     }
 
     @Override

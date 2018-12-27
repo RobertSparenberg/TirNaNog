@@ -1,33 +1,17 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.data.Capability;
-import net.frozenchaos.TirNaNog.data.ModuleConfig;
-import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
-import net.frozenchaos.TirNaNog.utils.ScheduledTask;
-import net.frozenchaos.TirNaNog.utils.Timer;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.xml.bind.JAXB;
-import java.io.*;
-import java.net.InetSocketAddress;
-import java.net.ServerSocket;
-import java.net.Socket;
-import java.net.SocketTimeoutException;
-import java.util.List;
-import java.util.Queue;
-import java.util.concurrent.ConcurrentLinkedDeque;
-
-/*
-The telephone is responsible for ringing other TirNaNog devices to tell them about this modules IP.
-Additionally it is responsible for being rang and being told other modules their IP if they've changed.
-
-So the singular concern is synchronizing IP addresses between TirNaNog modules.
-
-A module knows what the last IP is that they've broadcast through the Broadcaster class.
-Any module that hasn't responded through the Telephone is considered to know this module by its old IP.
+/**
+ * Todo: The telephone is still needed to retrieve updates from other nodes, but it doesn't actually serve a purpose in discovery
+ * The telephone is responsible for ringing other TirNaNog devices to tell them about this modules IP.
+ * Additionally it is responsible for being rang and being told other modules their IP if they've changed.
+ *
+ * So the singular concern is synchronizing IP addresses between TirNaNog modules.
+ *
+ * A module knows what the last IP is that they've broadcast through the Broadcaster class.
+ * Any module that hasn't responded through the Telephone is considered to know this module by its old IP.
  */
 public class Telephone {
+    /*
     private static final int SOCKET_TIMEOUT = 5000;
     private static final int DELAY_BETWEEN_CALLS = 2000;
     private static final int TELEPHONE_PORT = 42002;
@@ -44,7 +28,7 @@ public class Telephone {
 
     private boolean stopRequested = false;
 
-    public Telephone(ModuleConfigRepository moduleConfigRepository, Timer timer, List<Capability> ownCapabilities) throws IOException {
+    public Telephone(ModuleConfigRepository moduleConfigRepository, CapabilityServer timer, Timer ownCapabilities) throws IOException {
         logger.trace("Telephone Initializing");
         this.moduleConfigRepository = moduleConfigRepository;
         serverSocket = new ServerSocket(TELEPHONE_PORT);
@@ -53,8 +37,8 @@ public class Telephone {
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
         this.ownName = ownConfig.getName();
-        ownConfig.getCapabilities().clear();
-        ownConfig.getCapabilities().addAll(ownCapabilities);
+        ownConfig.getCapabilityApplications().clear();
+        ownConfig.getCapabilityApplications().addAll(ownCapabilities);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         JAXB.marshal(ownConfig, outputStream);
         marshaledOwnConfig = outputStream.toByteArray();
@@ -130,4 +114,5 @@ public class Telephone {
     public void addContactToRing(ModuleConfig moduleConfig) {
         scheduledCalls.add(moduleConfig);
     }
+    */
 }

@@ -1,6 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.data.Capability;
+import net.frozenchaos.TirNaNog.capabilities.CapabilityServer;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.slf4j.Logger;
@@ -10,12 +10,9 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
-/*
-The explorer service is used to inform this device of other TirNaNog devices on the network.
-It will actively look for devices and keep its records of them updated whenever possible.
+/**
+ * The explorer service is used to inform this device of other TirNaNog devices on the network.
+ * It will actively look for devices and keep its records of them updated whenever possible.
  */
 @Service
 public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
@@ -23,22 +20,18 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
 
     private final ModuleConfigRepository moduleConfigRepository;
     private final Timer timer;
-    private final List<Capability> ownCapabilities = new ArrayList<>();
+    private final CapabilityServer capabilityServer;
 
     private Broadcaster broadcaster;
-    private Telephone telephone;
+//    private Telephone telephone;
     private boolean started = false;
 
 
     @Autowired
-    public Explorer(ModuleConfigRepository moduleConfigRepository, Timer timer) {
+    public Explorer(ModuleConfigRepository moduleConfigRepository, CapabilityServer capabilityServer, Timer timer) {
         this.moduleConfigRepository = moduleConfigRepository;
+        this.capabilityServer = capabilityServer;
         this.timer = timer;
-    }
-
-    @Autowired(required = false)
-    public void setOwnCapabilities(List<Capability> ownCapabilities) {
-        this.ownCapabilities.addAll(ownCapabilities);
     }
 
     @Override
@@ -46,15 +39,15 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
         if(!this.started) {
             logger.info("Initializing TirNaNog device explorer");
             try {
-                telephone = new Telephone(moduleConfigRepository, timer, ownCapabilities);
-                broadcaster = new Broadcaster(moduleConfigRepository, timer, telephone, ownCapabilities);
+//                telephone = new Telephone(moduleConfigRepository, capabilityServer, timer);
+                broadcaster = new Broadcaster(moduleConfigRepository, capabilityServer, timer);
                 started = true;
                 logger.info("TirNaNog device explorer initialized");
             } catch(Exception e) {
                 logger.error("Error initializing the TirNaNog device Explorer, shutting down the explorer", e);
-                if(telephone != null) {
-                    telephone.destroyGracefully();
-                }
+//                if(telephone != null) {
+//                    telephone.destroyGracefully();
+//                }
                 if(broadcaster != null) {
                     broadcaster.destroyGracefully();
                 }

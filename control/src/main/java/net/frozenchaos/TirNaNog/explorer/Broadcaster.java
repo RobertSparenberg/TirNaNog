@@ -1,6 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.data.Capability;
+import net.frozenchaos.TirNaNog.capabilities.CapabilityServer;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
@@ -16,11 +16,10 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.List;
 
-/*
-The broadcaster is responsible for letting the TirNaNog network know about this module and what its IP is.
-Each other module is responsible for ringing this module with the Telephone class to let us know where it is and that it heard our broadcast.
+/**
+ * The broadcaster is responsible for letting the TirNaNog network know about this module and what its IP is.
+ * Each other module is responsible for ringing this module with the Telephone class to let us know where it is and that it heard our broadcast.
  */
 public class Broadcaster {
     private static final int BROADCAST_PORT = 42001;
@@ -28,10 +27,10 @@ public class Broadcaster {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
-    private final Telephone telephone;
+    private final CapabilityServer capabilityServer;
+//    private final Telephone telephone;
 
-    private final byte[] marshaledOwnConfig;
-    private final String ownName;
+    private final ModuleConfig ownConfig;
     private final DatagramSocket broadcastSocket;
     private final DatagramSocket listenSocket;
     private final InetAddress broadcastAddress;
@@ -39,23 +38,18 @@ public class Broadcaster {
 
     private boolean stopRequested = false;
 
-    public Broadcaster(ModuleConfigRepository moduleConfigRepository, Timer timer, Telephone telephone, List<Capability> ownCapabilities) throws IOException, JAXBException {
+    public Broadcaster(ModuleConfigRepository moduleConfigRepository, CapabilityServer capabilityServer, Timer timer) throws IOException, JAXBException {
         logger.trace("Broadcaster initializing");
         this.moduleConfigRepository = moduleConfigRepository;
-        this.telephone = telephone;
+        this.capabilityServer = capabilityServer;
+//        this.telephone = telephone;
 
         broadcastSocket = new DatagramSocket();
         broadcastSocket.setBroadcast(true);
         broadcastSocket.setReuseAddress(true);
         broadcastAddress = InetAddress.getByName("192.168.1.255");
 
-        ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
-        ownName = ownConfig.getName();
-        ownConfig.getCapabilities().clear();
-        ownConfig.getCapabilities().addAll(ownCapabilities);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        JAXB.marshal(ownConfig, outputStream);
-        marshaledOwnConfig = outputStream.toByteArray();
+        ownConfig = moduleConfigRepository.findByIp("localhost");
 
         listenSocket = new DatagramSocket(BROADCAST_PORT);
         listenThread = new Thread(this::receiveBroadcast);
@@ -85,14 +79,15 @@ public class Broadcaster {
                 DatagramPacket receivedBroadcast = new DatagramPacket(buffer, buffer.length);
                 listenSocket.receive(receivedBroadcast);
                 if(!stopRequested) {
-                    //todo: find a simpler way to unmarshall the string
+                    //todo: find a simpler way to unmarshal the string
                     ModuleConfig moduleConfig = JAXB.unmarshal(new StringReader(new String(buffer).trim()), ModuleConfig.class);
-                    if(!this.ownName.equals(moduleConfig.getName())) {
+                    if(!ownConfig.getName().equals(moduleConfig.getName())) {
                         moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
                         moduleConfig.setIp(receivedBroadcast.getAddress().getHostAddress());
                         logger.trace("Broadcaster saving moduleconfig: "+moduleConfig.toString());
-                        moduleConfig = moduleConfigRepository.save(moduleConfig);
-                        telephone.addContactToRing(moduleConfig);
+                        moduleConfigRepository.save(moduleConfig);
+//                        moduleConfig = moduleConfigRepository.save(moduleConfig);
+//                        telephone.addContactToRing(moduleConfig);
                     }
                 }
             } catch(Exception e) {
@@ -102,10 +97,19 @@ public class Broadcaster {
     }
 
     public void findOtherModules() throws IOException {
-        DatagramPacket packet = new DatagramPacket(marshaledOwnConfig, marshaledOwnConfig.length, broadcastAddress, BROADCAST_PORT);
+        byte[] ownConfig = getMarshaledOwnConfig();
+        DatagramPacket packet = new DatagramPacket(ownConfig, ownConfig.length, broadcastAddress, BROADCAST_PORT);
         broadcastSocket.send(packet);
         logger.trace("Sending broacast");
         broadcastSocket.close();
+    }
+
+    private byte[] getMarshaledOwnConfig() {
+        ownConfig.getCapabilityApplications().clear();
+        ownConfig.getCapabilityApplications().addAll(capabilityServer.getCapabilityApplications());
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        JAXB.marshal(ownConfig, outputStream);
+        return outputStream.toByteArray();
     }
 
     public void destroyGracefully() {

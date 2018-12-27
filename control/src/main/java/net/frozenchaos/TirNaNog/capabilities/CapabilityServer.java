@@ -33,6 +33,16 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
         logger.info("Capability Server initialized");
     }
 
+    public List<CapabilityApplication> getCapabilityApplications() {
+        synchronized(runningCapabilities) {
+            List<CapabilityApplication> capabilityApplications = new ArrayList<>(runningCapabilities.size());
+            for(CapabilityThread thread : runningCapabilities) {
+               capabilityApplications.add(thread.getProfile());
+            }
+            return capabilityApplications;
+        }
+    }
+
     private void acceptConnections() {
         try {
             serverSocket = new ServerSocket(CAPABILITIES_PORT);
@@ -72,6 +82,10 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
     @Override
     public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
         stopRequested.set(true);
+        try {
+            acceptConnectionsThread.join(SOCKET_TIMEOUT + 1000);
+        } catch(Exception ignored) {
+        }
         synchronized(runningCapabilities) {
             for(int i = runningCapabilities.size()-1; i >= 0; i--) {
                 CapabilityThread capability = runningCapabilities.get(i);
