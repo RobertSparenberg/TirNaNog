@@ -1,26 +1,32 @@
 package net.frozenchaos.TirNaNog.capabilities;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import javax.xml.bind.JAXB;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.Socket;
+import java.util.ArrayList;
+import java.util.List;
 
-class CapabilityThread extends Thread {
-    private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final CapabilityServer capabilityServer;
+/**
+ * Client class for connecting to the local TirNaNog application.
+ * All Capability applications should use it to communicate with the TirNaNog network.
+ */
+public class CapabilityClient extends Thread {
+    private final Socket socket;
+    private final List<ParameterProcessor> processors = new ArrayList<>();
+    private boolean stopRequested = false;
 
-    private Socket socket;
-    private CapabilityApplication profile = null;
-    private boolean stopRequested;
+    public CapabilityClient(CapabilityApplication profile) throws IOException {
+        this(profile, new ArrayList<>());
+    }
 
-    CapabilityThread(Socket socket, CapabilityServer capabilityServer) {
-        this.socket = socket;
-        this.capabilityServer = capabilityServer;
+    public CapabilityClient(CapabilityApplication profile, List<ParameterProcessor> processors) throws IOException {
+        super("Socket reading thread");
+        this.processors.addAll(processors);
+        socket = new Socket("localhost", 42000);
+        JAXB.marshal(profile, socket.getOutputStream());
     }
 
     @Override
@@ -29,7 +35,6 @@ class CapabilityThread extends Thread {
             BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             StringBuilder stringBuilder = new StringBuilder();
             boolean nextLineHasTheClassName = false;
-            String className = null;
             String closingTag = null;
             String line;
 
@@ -42,36 +47,38 @@ class CapabilityThread extends Thread {
                         clearStringBuilder(stringBuilder);
                         stringBuilder.append(line);
                     } else if(nextLineHasTheClassName) {
-                        className = line.substring(1, line.length()-1);
-                        closingTag = "</" + className + '>';
+                        closingTag = "</" + line.substring(1, line.length()-1) + '>';
                         nextLineHasTheClassName = false;
                         stringBuilder.append(line);
                     } else if(closingTag != null) {
                         stringBuilder.append(line);
                         if(closingTag.equals(line)) {
-                            processXml(stringBuilder.toString(), className);
+                            processXml(stringBuilder.toString());
                             clearStringBuilder(stringBuilder);
-                            className = null;
                             closingTag = null;
                         }
                     }
                 }
             }
         } catch(Exception e) {
-            logger.error("Error on CapabilityThread with name '"+getCapabilityName()+"'", e);
-            capabilityServer.removeCapability(this);
+            System.out.println("Error in capability thread: " + e.toString());
         }
     }
 
-    private void processXml(String xml, String className) {
+    private void processXml(String xml) {
         try {
-            if("CapabilityIdentification".equals(className)) {
-                synchronized(profile) {
-                    profile = JAXB.unmarshal(new StringReader(xml), CapabilityApplication.class);
+            ParameterSet parameterSet = JAXB.unmarshal(new StringReader(xml), ParameterSet.class);
+            for(Parameter parameter : parameterSet.getParameters()) {
+                if(parameter instanceof IntegerParameter) {
+                    for(ParameterProcessor processor : processors) {
+                        if(processor instanceof IntegerParameterProcessor) {
+                            ((IntegerParameterProcessor) processor).processParameter((IntegerParameter) parameter);
+                        }
+                    }
                 }
             }
         } catch(Exception e) {
-            logger.error("Error unmarshalling capability message", xml, e);
+            System.out.println("Error unmarshalling capability message: '"+xml+"', "+e.toString());
         }
     }
 
@@ -85,20 +92,5 @@ class CapabilityThread extends Thread {
 
     private void clearStringBuilder(StringBuilder stringBuilder) {
         stringBuilder.setLength(0);
-    }
-
-    public CapabilityApplication getProfile() {
-        synchronized(profile) {
-            return profile;
-        }
-    }
-
-    private String getCapabilityName() {
-        CapabilityApplication profile = getProfile();
-        if(profile != null) {
-            return profile.getName();
-        } else {
-            return "NoProfileKnownYet";
-        }
     }
 }

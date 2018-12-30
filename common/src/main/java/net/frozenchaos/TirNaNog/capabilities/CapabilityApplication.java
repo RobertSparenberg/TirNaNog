@@ -10,6 +10,14 @@ public class CapabilityApplication {
     private String name;
     private List<Capability> capabilities = new ArrayList<>();
 
+    public CapabilityApplication() {
+    }
+
+    public CapabilityApplication(String name, List<Capability> capabilities) {
+        this.name = name;
+        this.capabilities = capabilities;
+    }
+
     @XmlElement(name="name")
     public String getName() {
         return name;
