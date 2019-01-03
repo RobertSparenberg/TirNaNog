@@ -64,6 +64,7 @@ class CapabilityThread extends Thread {
     }
 
     private void processXml(String xml, String className) {
+        logger.trace("Received xml from capability: '" + xml +"' detected class: " + className);
         try {
             if("CapabilityIdentification".equals(className)) {
                 synchronized(profile) {

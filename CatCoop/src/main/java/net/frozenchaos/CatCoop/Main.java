@@ -14,7 +14,7 @@ import java.util.List;
 public class Main {
     public static void main(String[] varargs) throws InterruptedException, IOException {
         List<Capability> capabilities = new ArrayList<>();
-        capabilities.add(createCapability("Door", new IntegerParameterDefinition("Open", 0, 1, 1));
+        capabilities.add(createCapability("Door", new IntegerParameterDefinition("Open", 0, 1, 1)));
         CapabilityApplication profile = new CapabilityApplication("CatCoop", capabilities);
         CapabilityClient client = new CapabilityClient(profile);
         client.start();
@@ -24,5 +24,6 @@ public class Main {
         List<ParameterDefinition> parameters = new ArrayList<>();
         parameters.add(inputParameter);
         Capability capability = new Capability(name, parameters);
+        return capability;
     }
 }
