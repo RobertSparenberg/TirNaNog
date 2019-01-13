@@ -5,6 +5,7 @@ import org.hibernate.jpa.HibernatePersistenceProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.io.ResourceLoader;
 import org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean;
 
 import javax.sql.DataSource;
@@ -25,13 +26,20 @@ public class AppConfig {
     }
 
     @Bean
-    public LocalContainerEntityManagerFactoryBean factoryBean() {
-        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean();
+    public LocalContainerEntityManagerFactoryBean factoryBean() throws Exception {
+        LocalContainerEntityManagerFactoryBean factory = new LocalContainerEntityManagerFactoryBean() {
+            @Override
+            public void setResourceLoader(ResourceLoader resourceLoader) {
+                int i = 0;
+                //do nothing so the default doesn't get overridden; the override is not able to find persistence.xml
+            }
+        };
         factory.setDataSource(customDataSource());
         factory.setPersistenceProviderClass(HibernatePersistenceProvider.class);
-        factory.setPersistenceXmlLocation("common-persistence.xml");
+        factory.setPersistenceXmlLocation("persistence.xml");
+        factory.setPersistenceUnitName("TirNaNog");
         factory.setJpaProperties(properties);
-        System.out.println(properties.getProperty("spring.datasource.username", "Unknown"));
+
         return factory;
     }
 }

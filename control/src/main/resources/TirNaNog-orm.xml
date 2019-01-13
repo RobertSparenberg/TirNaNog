@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entity-mappings version="2.2"
+                 xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd">
+    <description>TirNaNog ORM Mappings - Includes mappings for both Control and Common</description>
+    <package>net.frozenchaos.TirNaNog</package>
+
+    <!-- TirNaNog-Control mappings -->
+    <entity class="net.frozenchaos.TirNaNog.data.ModuleConfig" name="ModuleConfig">
+        <table name="module_configs"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <basic name="ip">
+                <column name="ip" unique="true" nullable="false"/>
+            </basic>
+            <basic name="lastMessageTimestamp">
+                <column name="last_message_timestamp"/>
+            </basic>
+            <basic name="hardwareInterfaceOnly">
+                <column name="hardware_interface_only"/>
+            </basic>
+            <one-to-many name="capability_applications" fetch="EAGER" orphan-removal="true" target-entity="CapabilityApplication">
+                <join-column name="owning_module_config"/>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <!-- TirNaNog-Common mappings -->
+    <entity class="net.frozenchaos.TirNaNog.capabilities.CapabilityApplication" name="CapabilityApplication">
+        <table name="capability_applications"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <basic name="owningModuleConfig">
+                <column name="owning_module_config"/>
+            </basic>
+            <one-to-many name="capabilities" fetch="EAGER" orphan-removal="true" target-entity="Capability">
+                <join-column name="capability"/>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.capabilities.Capability" name="Capability">
+        <table name="capabilities"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <one-to-many name="parameters" fetch="EAGER" orphan-removal="true" target-entity="ParameterDefinition">
+                <join-column name="capability_name"/>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.capabilities.ParameterDefinition" name="ParameterDefinition">
+        <table name="parameter_definitions"/>
+        <discriminator-column name="parameter_type" discriminator-type="STRING"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.capabilities.IntegerParameterDefinition" name="IntegerParameterDefinition">
+        <table name="parameter_definitions"/>
+        <discriminator-value>Integer</discriminator-value>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <basic name="rangeMinimum">
+                <column name="range_minimum"/>
+            </basic>
+            <basic name="rangeMaximum">
+                <column name="range_maximum"/>
+            </basic>
+            <basic name="step">
+                <column name="step"/>
+            </basic>
+        </attributes>
+    </entity>
+</entity-mappings>

@@ -16,6 +16,8 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.Properties;
 
 /**
  * The broadcaster is responsible for letting the TirNaNog network know about this module and what its IP is.
@@ -23,7 +25,10 @@ import java.net.InetAddress;
  */
 public class Broadcaster {
     private static final int BROADCAST_PORT = 42001;
-    private static final int REBROADCAST_DELAY = 41000;
+    private static final String REBROADCAST_DELAY_PROPERTY = "net.frozenchaos.TirNaNog.broadcast_delay";
+    private static final String MODULE_NAME_PROPERTY = "net.frozenchaos.TirNaNog.module_name";
+    private final int REBROADCAST_DELAY = 41000;
+    private final int MODULE_NAME = 41000;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
@@ -38,7 +43,7 @@ public class Broadcaster {
 
     private boolean stopRequested = false;
 
-    public Broadcaster(ModuleConfigRepository moduleConfigRepository, CapabilityServer capabilityServer, Timer timer) throws IOException, JAXBException {
+    public Broadcaster(ModuleConfigRepository moduleConfigRepository, CapabilityServer capabilityServer, Timer timer, Properties properties) throws IOException, JAXBException {
         logger.trace("Broadcaster initializing");
         this.moduleConfigRepository = moduleConfigRepository;
         this.capabilityServer = capabilityServer;
@@ -49,7 +54,9 @@ public class Broadcaster {
         broadcastSocket.setReuseAddress(true);
         broadcastAddress = InetAddress.getByName("192.168.1.255");
 
-        ownConfig = moduleConfigRepository.findByIp("localhost");
+        String name = properties.getProperty(MODULE_NAME_PROPERTY, "Unknown");
+        ownConfig = new ModuleConfig(name, "localhost", false, new ArrayList<>());
+        logger.info("Broadcaster is setting own module config to: " + ownConfig);
 
         listenSocket = new DatagramSocket(BROADCAST_PORT);
         listenThread = new Thread(this::receiveBroadcast);
