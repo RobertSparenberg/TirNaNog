@@ -11,10 +11,10 @@
         <table name="module_configs"/>
         <attributes>
             <id name="name">
-                <column name="name" unique="true" nullable="false"/>
+                <column name="name" unique="true" nullable="false" length="64"/>
             </id>
             <basic name="ip">
-                <column name="ip" unique="true" nullable="false"/>
+                <column name="ip" unique="true" nullable="false" length="15"/>
             </basic>
             <basic name="lastMessageTimestamp">
                 <column name="last_message_timestamp"/>
@@ -22,9 +22,7 @@
             <basic name="hardwareInterfaceOnly">
                 <column name="hardware_interface_only"/>
             </basic>
-            <one-to-many name="capability_applications" fetch="EAGER" orphan-removal="true" target-entity="CapabilityApplication">
-                <join-column name="owning_module_config"/>
-            </one-to-many>
+            <one-to-many name="capability_applications" fetch="EAGER" orphan-removal="true" target-entity="CapabilityApplication" mapped-by="owningModuleConfig"/>
         </attributes>
     </entity>
 
@@ -35,12 +33,10 @@
             <id name="name">
                 <column name="name" unique="true" nullable="false"/>
             </id>
-            <basic name="owningModuleConfig">
-                <column name="owning_module_config"/>
-            </basic>
-            <one-to-many name="capabilities" fetch="EAGER" orphan-removal="true" target-entity="Capability">
-                <join-column name="capability"/>
-            </one-to-many>
+            <many-to-one name="owningModuleConfig">
+                <join-column name="owning_module_config" nullable="false"/>
+            </many-to-one>
+            <one-to-many name="capabilities" fetch="EAGER" orphan-removal="true" target-entity="Capability" mapped-by="capabilityApplication"/>
         </attributes>
     </entity>
 
@@ -50,9 +46,10 @@
             <id name="name">
                 <column name="name" unique="true" nullable="false"/>
             </id>
-            <one-to-many name="parameters" fetch="EAGER" orphan-removal="true" target-entity="ParameterDefinition">
-                <join-column name="capability_name"/>
-            </one-to-many>
+            <many-to-one name="capabilityApplication">
+                <join-column name="owning_capability_application" nullable="false"/>
+            </many-to-one>
+            <one-to-many name="parameters" fetch="EAGER" orphan-removal="true" target-entity="ParameterDefinition" mapped-by="owningCapability"/>
         </attributes>
     </entity>
 
@@ -63,6 +60,9 @@
             <id name="name">
                 <column name="name" unique="true" nullable="false"/>
             </id>
+            <many-to-one name="owningCapability">
+                <join-column name="owning_capability" nullable="false"/>
+            </many-to-one>
         </attributes>
     </entity>
 
@@ -74,13 +74,13 @@
                 <column name="name" unique="true" nullable="false"/>
             </id>
             <basic name="rangeMinimum">
-                <column name="range_minimum"/>
+                <column name="range_minimum" nullable="false"/>
             </basic>
             <basic name="rangeMaximum">
-                <column name="range_maximum"/>
+                <column name="range_maximum" nullable="false"/>
             </basic>
             <basic name="step">
-                <column name="step"/>
+                <column name="step" nullable="false"/>
             </basic>
         </attributes>
     </entity>
