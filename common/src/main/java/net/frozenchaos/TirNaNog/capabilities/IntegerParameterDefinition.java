@@ -5,13 +5,11 @@ import javax.xml.bind.annotation.XmlElement;
 public class IntegerParameterDefinition extends ParameterDefinition {
     private int rangeMinimum;
     private int rangeMaximum;
-    private int step;
 
-    public IntegerParameterDefinition(String name, int rangeMinimum, int rangeMaximum, int step) {
+    public IntegerParameterDefinition(String name, int rangeMinimum, int rangeMaximum) {
         super(name);
         this.rangeMinimum = rangeMinimum;
         this.rangeMaximum = rangeMaximum;
-        this.step = step;
     }
 
     @XmlElement(name="range_minimum")
@@ -30,14 +28,5 @@ public class IntegerParameterDefinition extends ParameterDefinition {
 
     public void setRangeMaximum(int rangeMaximum) {
         this.rangeMaximum = rangeMaximum;
-    }
-
-    @XmlElement(name="step")
-    public int getStep() {
-        return step;
-    }
-
-    public void setStep(int step) {
-        this.step = step;
     }
 }

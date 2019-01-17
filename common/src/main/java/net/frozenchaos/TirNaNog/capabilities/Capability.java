@@ -8,9 +8,10 @@ public class Capability {
     private List<ParameterDefinition> inputParameterDefinitions = new ArrayList<>();
     private List<ParameterDefinition> outputParameterDefinitions = new ArrayList<>();
 
-    public Capability(String name, List<ParameterDefinition> inputParameterDefinitions) {
+    public Capability(String name, List<ParameterDefinition> inputParameterDefinitions, List<ParameterDefinition> outputParameterDefinitions) {
         setName(name);
         setInputParameterDefinitions(inputParameterDefinitions);
+        setOutputParameterDefinitions(outputParameterDefinitions);
     }
 
     public String getName() {
@@ -26,7 +27,7 @@ public class Capability {
     }
 
     public void setInputParameterDefinitions(List<ParameterDefinition> inputParameterDefinitions) {
-        this.inputParameterDefinitions = inputParameterDefinitions;
+        this.inputParameterDefinitions.addAll(inputParameterDefinitions);
     }
 
     public List<ParameterDefinition> getOutputParameterDefinitions() {

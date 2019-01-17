@@ -3,53 +3,66 @@
                  xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                  xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd">
-    <description>TirNaNog ORM Mappings - Includes mappings for both Control and Common</description>
+    <description>TirNaNog ORM Mappings - Includes mappings for Common</description>
     <package>net.frozenchaos.TirNaNog</package>
 
     <!-- TirNaNog-Control mappings -->
+
     <entity class="net.frozenchaos.TirNaNog.data.ModuleConfig" name="ModuleConfig">
         <table name="module_configs"/>
         <attributes>
-            <id name="name">
+            <id name="name" access="PROPERTY">
                 <column name="name" unique="true" nullable="false" length="64"/>
             </id>
-            <basic name="ip">
+            <basic name="ip" access="PROPERTY">
                 <column name="ip" unique="true" nullable="false" length="15"/>
             </basic>
-            <basic name="lastMessageTimestamp">
+            <basic name="lastMessageTimestamp" access="PROPERTY">
                 <column name="last_message_timestamp"/>
             </basic>
-            <basic name="hardwareInterfaceOnly">
+            <basic name="hardwareInterfaceOnly" access="PROPERTY">
                 <column name="hardware_interface_only"/>
             </basic>
-            <one-to-many name="capability_applications" fetch="EAGER" orphan-removal="true" target-entity="CapabilityApplication" mapped-by="owningModuleConfig"/>
+            <one-to-many name="capability_applications" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.CapabilityApplication">
+                <join-column name="owning_module_config" referenced-column-name="name" nullable="false"/>
+            </one-to-many>
         </attributes>
     </entity>
 
+
+
     <!-- TirNaNog-Common mappings -->
+
     <entity class="net.frozenchaos.TirNaNog.capabilities.CapabilityApplication" name="CapabilityApplication">
         <table name="capability_applications"/>
         <attributes>
-            <id name="name">
+            <id name="name" access="PROPERTY">
                 <column name="name" unique="true" nullable="false"/>
             </id>
-            <many-to-one name="owningModuleConfig">
-                <join-column name="owning_module_config" nullable="false"/>
-            </many-to-one>
-            <one-to-many name="capabilities" fetch="EAGER" orphan-removal="true" target-entity="Capability" mapped-by="capabilityApplication"/>
+            <one-to-many name="capabilities" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.Capability">
+                <join-column name="owning_capability_application" referenced-column-name="name" nullable="false"/>
+            </one-to-many>
         </attributes>
     </entity>
 
     <entity class="net.frozenchaos.TirNaNog.capabilities.Capability" name="Capability">
         <table name="capabilities"/>
         <attributes>
-            <id name="name">
+            <id name="name" access="PROPERTY">
                 <column name="name" unique="true" nullable="false"/>
             </id>
-            <many-to-one name="capabilityApplication">
-                <join-column name="owning_capability_application" nullable="false"/>
-            </many-to-one>
-            <one-to-many name="parameters" fetch="EAGER" orphan-removal="true" target-entity="ParameterDefinition" mapped-by="owningCapability"/>
+            <one-to-many name="inputParameterDefinitions" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.ParameterDefinition">
+                <join-table name="capability_input_parameters">
+                    <join-column name="capability_name" referenced-column-name="name" nullable="false"/>
+                    <inverse-join-column name="parameter_name" referenced-column-name="name" unique="true" />
+                </join-table>
+            </one-to-many>
+            <one-to-many name="outputParameterDefinitions" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.ParameterDefinition">
+                <join-table name="capability_output_parameters">
+                    <join-column name="capability_name" referenced-column-name="name" nullable="false"/>
+                    <inverse-join-column name="parameter_name" referenced-column-name="name" unique="true" />
+                </join-table>
+            </one-to-many>
         </attributes>
     </entity>
 
@@ -57,30 +70,24 @@
         <table name="parameter_definitions"/>
         <discriminator-column name="parameter_type" discriminator-type="STRING"/>
         <attributes>
-            <id name="name">
+            <id name="name" access="PROPERTY">
                 <column name="name" unique="true" nullable="false"/>
             </id>
-            <many-to-one name="owningCapability">
-                <join-column name="owning_capability" nullable="false"/>
-            </many-to-one>
         </attributes>
     </entity>
 
-    <entity class="net.frozenchaos.TirNaNog.capabilities.IntegerParameterDefinition" name="IntegerParameterDefinition">
+    <entity class="net.frozenchaos.TirNaNog.capabilities.IntegerParameterDefinition">
         <table name="parameter_definitions"/>
         <discriminator-value>Integer</discriminator-value>
         <attributes>
-            <id name="name">
+            <id name="name" access="PROPERTY">
                 <column name="name" unique="true" nullable="false"/>
             </id>
-            <basic name="rangeMinimum">
+            <basic name="rangeMinimum" access="PROPERTY">
                 <column name="range_minimum" nullable="false"/>
             </basic>
-            <basic name="rangeMaximum">
+            <basic name="rangeMaximum" access="PROPERTY">
                 <column name="range_maximum" nullable="false"/>
-            </basic>
-            <basic name="step">
-                <column name="step" nullable="false"/>
             </basic>
         </attributes>
     </entity>

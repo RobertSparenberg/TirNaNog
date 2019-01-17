@@ -2,13 +2,14 @@ package net.frozenchaos.TirNaNog.capabilities;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public abstract class ParameterDefinition {
+abstract class ParameterDefinition implements InputParameterDefinition, OutputParameterDefinition {
     private String name;
 
     ParameterDefinition(String name) {
         this.name = name;
     }
 
+    @Override
     @XmlElement(name="name")
     public String getName() {
         return name;
