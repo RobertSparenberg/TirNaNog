@@ -5,7 +5,7 @@ import java.util.List;
 
 public class Capability {
     private String name;
-    private ArrayList<ParameterDefinition> parameterDefinitions = new ArrayList<>();
+    private List<ParameterDefinition> parameterDefinitions = new ArrayList<>();
 
     public Capability(String name, List<ParameterDefinition> parameterDefinitions) {
         setName(name);

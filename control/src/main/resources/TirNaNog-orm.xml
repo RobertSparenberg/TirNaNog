@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<entity-mappings version="2.2"
+<entity-mappings version="2.1"
                  xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_2.xsd">
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
     <description>TirNaNog ORM Mappings - Includes mappings for Common</description>
     <package>net.frozenchaos.TirNaNog</package>
 
@@ -25,6 +25,7 @@
             </basic>
             <one-to-many name="capability_applications" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.CapabilityApplication">
                 <join-column name="owning_module_config" referenced-column-name="name" nullable="false"/>
+                <cascade><cascade-all/></cascade>
             </one-to-many>
         </attributes>
     </entity>
@@ -41,6 +42,7 @@
             </id>
             <one-to-many name="capabilities" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.Capability">
                 <join-column name="owning_capability_application" referenced-column-name="name" nullable="false"/>
+                <cascade><cascade-all/></cascade>
             </one-to-many>
         </attributes>
     </entity>
@@ -52,10 +54,11 @@
                 <column name="name" unique="true" nullable="false"/>
             </id>
             <one-to-many name="parameterDefinitions" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.ParameterDefinition">
-                <join-table name="capability_parameters">
+                <!--<join-table name="capability_parameters">-->
                     <join-column name="capability_name" referenced-column-name="name" nullable="false"/>
-                    <inverse-join-column name="parameter_name" referenced-column-name="name" unique="true" />
-                </join-table>
+                    <!--<inverse-join-column name="parameter_name" referenced-column-name="name" unique="true" />-->
+                    <cascade><cascade-all/></cascade>
+                <!--</join-table>-->
             </one-to-many>
         </attributes>
     </entity>

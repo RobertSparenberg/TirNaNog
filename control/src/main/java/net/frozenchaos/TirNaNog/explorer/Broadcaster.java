@@ -16,7 +16,6 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.ArrayList;
 import java.util.Properties;
 
 /**
@@ -55,7 +54,7 @@ public class Broadcaster {
         broadcastAddress = InetAddress.getByName("192.168.1.255");
 
         String name = properties.getProperty(MODULE_NAME_PROPERTY, "Unknown");
-        ownConfig = new ModuleConfig(name, "localhost", false, new ArrayList<>());
+        ownConfig = new ModuleConfig(name, "localhost", false);
         logger.info("Broadcaster is setting own module config to: " + ownConfig);
 
         listenSocket = new DatagramSocket(BROADCAST_PORT);
@@ -112,8 +111,7 @@ public class Broadcaster {
     }
 
     private byte[] getMarshaledOwnConfig() {
-        ownConfig.getCapabilityApplications().clear();
-        ownConfig.getCapabilityApplications().addAll(capabilityServer.getCapabilityApplications());
+        ownConfig.setCapabilityApplications((net.frozenchaos.TirNaNog.capabilities.CapabilityApplication[]) capabilityServer.getCapabilityApplications().toArray());
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         JAXB.marshal(ownConfig, outputStream);
         return outputStream.toByteArray();

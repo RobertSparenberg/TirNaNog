@@ -5,8 +5,6 @@ import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 @XmlRootElement
 public class ModuleConfig implements Serializable {
@@ -14,20 +12,17 @@ public class ModuleConfig implements Serializable {
     private String ip;
     private long lastMessageTimestamp;
     private boolean hardwareInterfaceOnly;
-    private ArrayList<CapabilityApplication> capabilityApplications = new ArrayList<>();
+    //this has to be an array for JPA reasons, it cannot find the type of the list if used as a list
+    private CapabilityApplication capabilityApplications[];
 
-    public ModuleConfig(String name, String ip, boolean hardwareInterfaceOnly, List<CapabilityApplication> capabilityApplications) {
+    public ModuleConfig() {
+    }
+
+    public ModuleConfig(String name, String ip, boolean hardwareInterfaceOnly) {
         this.name = name;
         this.ip = ip;
         this.hardwareInterfaceOnly = hardwareInterfaceOnly;
         this.lastMessageTimestamp = -1;
-        this.capabilityApplications.addAll(capabilityApplications);
-    }
-
-    /**
-     * Default constructor for use by JPA.
-     */
-    public ModuleConfig() {
     }
 
     @XmlElement(name="name")
@@ -65,12 +60,12 @@ public class ModuleConfig implements Serializable {
     }
 
     @XmlElement(name="capability_applications")
-    public List<CapabilityApplication> getCapabilityApplications() {
+    public CapabilityApplication[] getCapabilityApplications() {
         return capabilityApplications;
     }
 
-    public void setCapabilityApplications(List<CapabilityApplication> capabilityApplications) {
-        this.capabilityApplications.addAll(capabilityApplications);
+    public void setCapabilityApplications(CapabilityApplication[] capabilityApplications) {
+        this.capabilityApplications = capabilityApplications;
     }
 
     @Override
