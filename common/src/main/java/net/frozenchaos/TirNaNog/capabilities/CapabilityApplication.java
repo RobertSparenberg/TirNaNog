@@ -15,7 +15,7 @@ public class CapabilityApplication {
 
     public CapabilityApplication(String name, List<Capability> capabilities) {
         this.name = name;
-        this.capabilities = capabilities;
+        this.capabilities.addAll(capabilities);
     }
 
     @XmlElement(name="name")

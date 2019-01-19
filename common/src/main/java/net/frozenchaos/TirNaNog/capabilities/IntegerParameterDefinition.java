@@ -6,8 +6,8 @@ public class IntegerParameterDefinition extends ParameterDefinition {
     private int rangeMinimum;
     private int rangeMaximum;
 
-    public IntegerParameterDefinition(String name, int rangeMinimum, int rangeMaximum) {
-        super(name);
+    public IntegerParameterDefinition(String name, ParameterType parameterType, int rangeMinimum, int rangeMaximum) {
+        super(name, parameterType);
         this.rangeMinimum = rangeMinimum;
         this.rangeMaximum = rangeMaximum;
     }

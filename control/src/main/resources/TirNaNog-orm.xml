@@ -11,7 +11,7 @@
     <entity class="net.frozenchaos.TirNaNog.data.ModuleConfig" name="ModuleConfig">
         <table name="module_configs"/>
         <attributes>
-            <id name="name" access="PROPERTY">
+            <id name="name">
                 <column name="name" unique="true" nullable="false" length="64"/>
             </id>
             <basic name="ip" access="PROPERTY">
@@ -51,14 +51,8 @@
             <id name="name" access="PROPERTY">
                 <column name="name" unique="true" nullable="false"/>
             </id>
-            <one-to-many name="inputParameterDefinitions" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.ParameterDefinition">
-                <join-table name="capability_input_parameters">
-                    <join-column name="capability_name" referenced-column-name="name" nullable="false"/>
-                    <inverse-join-column name="parameter_name" referenced-column-name="name" unique="true" />
-                </join-table>
-            </one-to-many>
-            <one-to-many name="outputParameterDefinitions" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.ParameterDefinition">
-                <join-table name="capability_output_parameters">
+            <one-to-many name="parameterDefinitions" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.ParameterDefinition">
+                <join-table name="capability_parameters">
                     <join-column name="capability_name" referenced-column-name="name" nullable="false"/>
                     <inverse-join-column name="parameter_name" referenced-column-name="name" unique="true" />
                 </join-table>
@@ -73,6 +67,10 @@
             <id name="name" access="PROPERTY">
                 <column name="name" unique="true" nullable="false"/>
             </id>
+            <basic name="parameterType">
+                <column name="paramater_type" nullable="false"/>
+                <enumerated>STRING</enumerated>
+            </basic>
         </attributes>
     </entity>
 

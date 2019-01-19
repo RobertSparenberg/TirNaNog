@@ -14,7 +14,7 @@ public class ModuleConfig implements Serializable {
     private String ip;
     private long lastMessageTimestamp;
     private boolean hardwareInterfaceOnly;
-    private List<CapabilityApplication> capabilityApplications = new ArrayList<>();
+    private ArrayList<CapabilityApplication> capabilityApplications = new ArrayList<>();
 
     public ModuleConfig(String name, String ip, boolean hardwareInterfaceOnly, List<CapabilityApplication> capabilityApplications) {
         this.name = name;

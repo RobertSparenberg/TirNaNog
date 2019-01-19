@@ -5,13 +5,11 @@ import java.util.List;
 
 public class Capability {
     private String name;
-    private List<ParameterDefinition> inputParameterDefinitions = new ArrayList<>();
-    private List<ParameterDefinition> outputParameterDefinitions = new ArrayList<>();
+    private ArrayList<ParameterDefinition> parameterDefinitions = new ArrayList<>();
 
-    public Capability(String name, List<ParameterDefinition> inputParameterDefinitions, List<ParameterDefinition> outputParameterDefinitions) {
+    public Capability(String name, List<ParameterDefinition> parameterDefinitions) {
         setName(name);
-        setInputParameterDefinitions(inputParameterDefinitions);
-        setOutputParameterDefinitions(outputParameterDefinitions);
+        this.parameterDefinitions.addAll(parameterDefinitions);
     }
 
     public String getName() {
@@ -22,19 +20,11 @@ public class Capability {
         this.name = name;
     }
 
-    public List<ParameterDefinition> getInputParameterDefinitions() {
-        return inputParameterDefinitions;
+    public List<ParameterDefinition> getParameterDefinitions() {
+        return parameterDefinitions;
     }
 
-    public void setInputParameterDefinitions(List<ParameterDefinition> inputParameterDefinitions) {
-        this.inputParameterDefinitions.addAll(inputParameterDefinitions);
-    }
-
-    public List<ParameterDefinition> getOutputParameterDefinitions() {
-        return outputParameterDefinitions;
-    }
-
-    public void setOutputParameterDefinitions(List<ParameterDefinition> outputParameterDefinitions) {
-        this.outputParameterDefinitions.addAll(outputParameterDefinitions);
+    public void setParameterDefinitions(List<ParameterDefinition> parameterDefinitions) {
+        this.parameterDefinitions.addAll(parameterDefinitions);
     }
 }
