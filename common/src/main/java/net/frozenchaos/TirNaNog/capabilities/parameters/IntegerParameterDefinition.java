@@ -1,4 +1,4 @@
-package net.frozenchaos.TirNaNog.capabilities;
+package net.frozenchaos.TirNaNog.capabilities.parameters;
 
 import javax.xml.bind.annotation.XmlElement;
 

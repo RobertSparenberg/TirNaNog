@@ -13,8 +13,12 @@ public class CapabilityApplication {
     public CapabilityApplication() {
     }
 
-    public CapabilityApplication(String name, List<Capability> capabilities) {
+    public CapabilityApplication(String name) {
         this.name = name;
+    }
+
+    public CapabilityApplication(String name, List<Capability> capabilities) {
+        this(name);
         this.capabilities.addAll(capabilities);
     }
 

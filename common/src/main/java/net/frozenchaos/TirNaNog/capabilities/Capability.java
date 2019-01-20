@@ -1,5 +1,7 @@
 package net.frozenchaos.TirNaNog.capabilities;
 
+import net.frozenchaos.TirNaNog.capabilities.parameters.ParameterDefinition;
+
 import java.util.ArrayList;
 import java.util.List;
 

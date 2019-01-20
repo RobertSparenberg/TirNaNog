@@ -1,5 +1,7 @@
 package net.frozenchaos.TirNaNog.capabilities;
 
+import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package net.frozenchaos.TirNaNog.capabilities;
+package net.frozenchaos.TirNaNog.capabilities.parameters;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -26,6 +26,26 @@ public abstract class ParameterDefinition {
 
     public void setParameterType(ParameterType parameterType) {
         this.parameterType = parameterType;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if(this == o) return true;
+        if(!(o instanceof ParameterDefinition)) return false;
+
+        ParameterDefinition that = (ParameterDefinition) o;
+
+        if(name != null ? !name.equals(that.name) : that.name != null) return false;
+        if(parameterType != that.parameterType) return false;
+
+        return true;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = name != null ? name.hashCode() : 0;
+        result = 31*result+(parameterType != null ? parameterType.hashCode() : 0);
+        return result;
     }
 
     public enum ParameterType {

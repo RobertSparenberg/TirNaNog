@@ -6,6 +6,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
@@ -15,7 +16,6 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
 public class CapabilityServer implements ApplicationListener<ContextRefreshedEvent> {
-    private static final int CAPABILITIES_PORT = 42000;
     private static final int SOCKET_TIMEOUT = 5000;
     private static final long CAPABILITY_SHUTDOWN_TIMEOUT = 2000;
 
@@ -45,7 +45,7 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
 
     private void acceptConnections() {
         try {
-            serverSocket = new ServerSocket(CAPABILITIES_PORT);
+            serverSocket = new ServerSocket(CapabilityClient.CAPABILITIES_PORT);
             serverSocket.setSoTimeout(SOCKET_TIMEOUT);
             while(!stopRequested.get()) {
                 try {
@@ -55,7 +55,10 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
                 }
             }
         } catch(Exception e) {
-            //close down socket
+            try {
+                serverSocket.close();
+            } catch(IOException ignored) {
+            }
         }
     }
 

@@ -1,5 +1,7 @@
 package net.frozenchaos.TirNaNog.capabilities;
 
+import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
+
 import javax.xml.bind.JAXB;
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -14,18 +16,15 @@ import java.util.List;
  * All Capability applications should use it to communicate with the TirNaNog network.
  */
 public class CapabilityClient extends Thread {
+    static final int CAPABILITIES_PORT = 42000;
     private final Socket socket;
     private final List<ParameterProcessor> processors = new ArrayList<>();
     private boolean stopRequested = false;
 
-    public CapabilityClient(CapabilityApplication profile) throws IOException {
-        this(profile, new ArrayList<>());
-    }
-
     public CapabilityClient(CapabilityApplication profile, List<ParameterProcessor> processors) throws IOException {
         super("Socket reading thread");
         this.processors.addAll(processors);
-        socket = new Socket("localhost", 42000);
+        socket = new Socket("localhost", CAPABILITIES_PORT);
         JAXB.marshal(profile, socket.getOutputStream());
     }
 
@@ -62,6 +61,7 @@ public class CapabilityClient extends Thread {
             }
         } catch(Exception e) {
             System.out.println("Error in capability thread: " + e.toString());
+            stopGracefully();
         }
     }
 
@@ -69,11 +69,9 @@ public class CapabilityClient extends Thread {
         try {
             ParameterSet parameterSet = JAXB.unmarshal(new StringReader(xml), ParameterSet.class);
             for(Parameter parameter : parameterSet.getParameters()) {
-                if(parameter instanceof IntegerParameter) {
-                    for(ParameterProcessor processor : processors) {
-                        if(processor instanceof IntegerParameterProcessor) {
-                            ((IntegerParameterProcessor) processor).processParameter((IntegerParameter) parameter);
-                        }
+                for(ParameterProcessor processor : processors) {
+                    if(processor.canProcess(parameter)) {
+                        processor.processParamter(parameter);
                     }
                 }
             }
@@ -82,7 +80,7 @@ public class CapabilityClient extends Thread {
         }
     }
 
-    public void stopGracefully() {
+    public synchronized void stopGracefully() {
         stopRequested = true;
         try {
             socket.close();

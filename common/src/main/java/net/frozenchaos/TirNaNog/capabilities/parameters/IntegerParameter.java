@@ -1,4 +1,4 @@
-package net.frozenchaos.TirNaNog.capabilities;
+package net.frozenchaos.TirNaNog.capabilities.parameters;
 
 import javax.xml.bind.annotation.XmlElement;
 
@@ -12,5 +12,10 @@ public class IntegerParameter extends Parameter {
 
     public void setValue(int value) {
         this.value = value;
+    }
+
+    @Override
+    protected boolean matchesTypeOfDefinition(ParameterDefinition parameterDefinition) {
+        return parameterDefinition instanceof IntegerParameterDefinition;
     }
 }
