@@ -1,5 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
+import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
 import net.frozenchaos.TirNaNog.capabilities.CapabilityServer;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
@@ -16,6 +17,7 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -111,7 +113,12 @@ public class Broadcaster {
     }
 
     private byte[] getMarshaledOwnConfig() {
-        ownConfig.setCapabilityApplications((net.frozenchaos.TirNaNog.capabilities.CapabilityApplication[]) capabilityServer.getCapabilityApplications().toArray());
+
+        List<CapabilityApplication> capabilityApplicationsList = capabilityServer.getCapabilityApplications();
+        CapabilityApplication capabilityApplications[] = new CapabilityApplication[capabilityApplicationsList.size()];
+        capabilityApplicationsList.toArray(capabilityApplications);
+
+        ownConfig.setCapabilityApplications(capabilityApplications);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         JAXB.marshal(ownConfig, outputStream);
         return outputStream.toByteArray();

@@ -23,6 +23,9 @@ public class CatCoop extends TirNaNogCapabilityBase {
     private Logger logger = LoggerFactory.getLogger(CatCoop.class);
     private EnumParameterDefinition doorInputParameterDefinition = new EnumParameterDefinition("Open", ParameterDefinition.ParameterType.INPUT, "Open", "Close");
 
+    public CatCoop() throws Exception {
+    }
+
     @Override
     protected List<Capability> getCapabilities() {
         List<Capability> capabilities = new ArrayList<>();
@@ -41,6 +44,10 @@ public class CatCoop extends TirNaNogCapabilityBase {
             }
         });
         return processors;
+    }
+
+    @Override
+    protected void onShutdown() {
     }
 
     private Capability createCapability(String name, ParameterDefinition... inputParameters) {
