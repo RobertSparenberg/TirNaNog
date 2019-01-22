@@ -1,7 +1,9 @@
 package net.frozenchaos.TirNaNog.capabilities;
 
+import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
@@ -20,14 +22,17 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
     private static final long CAPABILITY_SHUTDOWN_TIMEOUT = 2000;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final AutomationControl automationControl;
     private final List<CapabilityThread> runningCapabilities = new ArrayList<>();
     private final Thread acceptConnectionsThread;
     private ServerSocket serverSocket;
 
     private AtomicBoolean stopRequested = new AtomicBoolean(false);
 
-    public CapabilityServer() {
+    @Autowired
+    public CapabilityServer(AutomationControl automationControl) {
         logger.info("Capability Server initializing");
+        this.automationControl = automationControl;
         this.acceptConnectionsThread = new Thread(this::acceptConnections);
         this.acceptConnectionsThread.start();
         logger.info("Capability Server initialized");
@@ -67,7 +72,7 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
         CapabilityThread capabilityThread;
         synchronized(runningCapabilities) {
             if(!stopRequested.get()) {
-                capabilityThread = new CapabilityThread(capabilitySocket, this);
+                capabilityThread = new CapabilityThread(capabilitySocket, this, automationControl);
                 runningCapabilities.add(capabilityThread);
                 capabilityThread.start();
             }

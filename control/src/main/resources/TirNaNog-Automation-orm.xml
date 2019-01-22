@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<entity-mappings version="2.1"
+                 xmlns="http://xmlns.jcp.org/xml/ns/persistence/orm"
+                 xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                 xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/persistence/orm http://xmlns.jcp.org/xml/ns/persistence/orm_2_1.xsd">
+    <description>TirNaNog ORM Mappings - Includes mappings for Common</description>
+    <package>net.frozenchaos.TirNaNog</package>
+
+    <!-- TirNaNog-Control mappings for automation -->
+
+    <entity class="net.frozenchaos.TirNaNog.automation.Function" name="Function">
+        <table name="automation_functions"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false" length="64"/>
+            </id>
+            <one-to-many name="rules" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.automation.Rule">
+                <join-column name="owning_function" referenced-column-name="name" nullable="false"/>
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.automation.Rule" name="Rule">
+        <table name="automation_rules"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <one-to-many name="triggers" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.automation.Trigger">
+                <join-column name="owning_rule" referenced-column-name="name" nullable="false"/>
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.automation.Trigger" name="Trigger">
+        <table name="automation_triggers"/>
+        <discriminator-column name="trigger_type" discriminator-type="STRING"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <one-to-many name="parameterDefinitions" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.capabilities.parameters.ParameterDefinition">
+                <join-column name="capability_name" referenced-column-name="name" nullable="false"/>
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.automation.ExactValueTrigger" name="Trigger">
+        <table name="automation_triggers"/>
+        <discriminator-value>ExactValue</discriminator-value>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <basic name="valueToMatch">
+                <column name="value_to_match" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.automation.ValueRangeTrigger" name="Trigger">
+        <table name="automation_triggers"/>
+        <discriminator-value>ValueRange</discriminator-value>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <basic name="valueToMatch">
+                <column name="value_to_match" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.automation.actions.Action" name="action">
+        <table name="automation_actions"/>
+        <discriminator-column name="action_type" discriminator-type="STRING"/>
+        <attributes>
+            <!--todo: make this a generated ID, and use the order column on order-->
+            <id name="id">
+                <column name="id" unique="true" nullable="false"/>
+            </id>
+        </attributes>
+    </entity>
+</entity-mappings>

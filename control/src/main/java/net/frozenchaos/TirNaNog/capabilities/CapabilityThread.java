@@ -1,5 +1,8 @@
 package net.frozenchaos.TirNaNog.capabilities;
 
+import net.frozenchaos.TirNaNog.automation.AutomationControl;
+import net.frozenchaos.TirNaNog.capabilities.parameters.EnumParameter;
+import net.frozenchaos.TirNaNog.capabilities.parameters.IntegerParameter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -13,14 +16,16 @@ import java.net.Socket;
 class CapabilityThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final CapabilityServer capabilityServer;
+    private final AutomationControl automationControl;
 
     private Socket socket;
     private CapabilityApplication profile = null;
     private boolean stopRequested;
 
-    CapabilityThread(Socket socket, CapabilityServer capabilityServer) {
+    CapabilityThread(Socket socket, CapabilityServer capabilityServer, AutomationControl automationControl) {
         this.socket = socket;
         this.capabilityServer = capabilityServer;
+        this.automationControl = automationControl;
     }
 
     @Override
@@ -66,10 +71,14 @@ class CapabilityThread extends Thread {
     private void processXml(String xml, String className) {
         logger.trace("Received xml from capability: '" + xml +"' detected class: " + className);
         try {
-            if("CapabilityIdentification".equals(className)) {
+            if(CapabilityApplication.class.getSimpleName().equals(className)) {
                 synchronized(profile) {
                     profile = JAXB.unmarshal(new StringReader(xml), CapabilityApplication.class);
                 }
+            } else if(EnumParameter.class.getSimpleName().equals(className)) {
+                automationControl.onParameter(JAXB.unmarshal(new StringReader(xml), EnumParameter.class));
+            } else if(IntegerParameter.class.getSimpleName().equals(className)) {
+                automationControl.onParameter(JAXB.unmarshal(new StringReader(xml), IntegerParameter.class));
             }
         } catch(Exception e) {
             logger.error("Error unmarshalling capability message", xml, e);

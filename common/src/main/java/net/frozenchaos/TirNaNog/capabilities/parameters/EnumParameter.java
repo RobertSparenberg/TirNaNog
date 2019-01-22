@@ -2,16 +2,17 @@ package net.frozenchaos.TirNaNog.capabilities.parameters;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public class EnumParameter extends Parameter {
+public class EnumParameter extends Parameter<String> {
     private String value;
-
-    @XmlElement(name = "value")
-    public String getValueAsString() {
-        return value;
-    }
 
     public void setValue(String value) {
         this.value = value;
+    }
+
+    @XmlElement(name = "value")
+    @Override
+    public String getValue() {
+        return value;
     }
 
     @Override

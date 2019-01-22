@@ -14,7 +14,7 @@ public class Rule {
 
     public void onParameter(Parameter parameter, Function function, AutomationControl automationControl) {
         for(Trigger trigger : triggers) {
-            if(trigger.isTriggered()) {
+            if(trigger.isTriggered(parameter)) {
                 for(Action action : actions) {
                     action.perform(parameter, function, automationControl);
                 }

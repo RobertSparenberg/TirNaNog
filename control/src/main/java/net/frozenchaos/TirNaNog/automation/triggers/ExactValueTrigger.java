@@ -1,11 +1,14 @@
 package net.frozenchaos.TirNaNog.automation.triggers;
 
+import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
+
 public class ExactValueTrigger extends Trigger {
     private String valueToMatch;
 
     @Override
-    public boolean isTriggered() {
-        return false;
+    public boolean isTriggered(Parameter parameter) {
+         return this.getParameterPath().equals(parameter.getParameterDefinitionPath())
+                 && valueToMatch.equals(parameter.getValue().toString());
     }
 
     public String getValueToMatch() {
