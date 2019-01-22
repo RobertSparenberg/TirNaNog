@@ -6,7 +6,7 @@ public abstract class ParameterDefinition {
     private String name;
     private ParameterType parameterType;
 
-    ParameterDefinition(String name, ParameterType parameterType) {
+    public ParameterDefinition(String name, ParameterType parameterType) {
         this.name = name;
         this.parameterType = parameterType;
     }

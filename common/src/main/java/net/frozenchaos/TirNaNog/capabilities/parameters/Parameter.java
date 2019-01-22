@@ -2,21 +2,30 @@ package net.frozenchaos.TirNaNog.capabilities.parameters;
 
 import javax.xml.bind.annotation.XmlElement;
 
-public abstract class Parameter {
-    private String parameterDefinitionName;
+public abstract class Parameter<T> {
+    private String parameterDefinitionPath;
 
-    @XmlElement(name = "parameter_definition_name")
-    public String getParameterDefinitionName() {
-        return parameterDefinitionName;
+    public Parameter() {
     }
 
-    public void setParameterDefinitionName(String name) {
-        this.parameterDefinitionName = name;
+    public Parameter(String parameterDefinitionPath) {
+        this.parameterDefinitionPath = parameterDefinitionPath;
+    }
+
+    @XmlElement(name = "parameter_definition_path")
+    public String getParameterDefinitionPath() {
+        return parameterDefinitionPath;
+    }
+
+    public void setParameterDefinitionPath(String name) {
+        this.parameterDefinitionPath = name;
     }
 
     public boolean matchesDefinition(ParameterDefinition parameterDefinition) {
-        return parameterDefinitionName.equals(parameterDefinition.getName()) && matchesTypeOfDefinition(parameterDefinition);
+        return parameterDefinitionPath.equals(parameterDefinition.getName()) && matchesTypeOfDefinition(parameterDefinition);
     }
 
     protected abstract boolean matchesTypeOfDefinition(ParameterDefinition parameterDefinition);
+
+    public abstract T getValue();
 }

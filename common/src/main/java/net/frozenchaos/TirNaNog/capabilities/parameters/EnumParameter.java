@@ -6,7 +6,7 @@ public class EnumParameter extends Parameter {
     private String value;
 
     @XmlElement(name = "value")
-    public String getValue() {
+    public String getValueAsString() {
         return value;
     }
 

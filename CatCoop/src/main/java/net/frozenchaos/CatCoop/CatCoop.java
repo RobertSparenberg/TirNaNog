@@ -40,7 +40,7 @@ public class CatCoop extends TirNaNogCapabilityBase {
             @Override
             public void processParamter(Parameter parameter) {
                 EnumParameter enumParameter = (EnumParameter) parameter;
-                logger.info("New value received for parameter '" + doorInputParameterDefinition.getName() + "' value: '" + enumParameter.getValue() + '\'');
+                logger.info("New value received for parameter '" + doorInputParameterDefinition.getName() + "' value: '" + enumParameter.getValueAsString() + '\'');
             }
         });
         return processors;

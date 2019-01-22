@@ -56,7 +56,7 @@ public class Timer implements Runnable {
                 }
             } else {
                 if(task.isReadyForExecution()) {
-                    logger.trace("Timer found a task to execute!");
+                    logger.trace("Timer found a task to onParameter!");
                     task.doTask();
                     removeTaskFromList(task);
                 } else {

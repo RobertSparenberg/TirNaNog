@@ -6,7 +6,7 @@ public class IntegerParameter extends Parameter {
     private int value;
 
     @XmlElement(name = "value")
-    public int getValue() {
+    public int getValueAsString() {
         return value;
     }
 
