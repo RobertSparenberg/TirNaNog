@@ -108,4 +108,14 @@
             </element-collection>
         </attributes>
     </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.capabilities.parameters.ByteArrayParameterDefinition">
+        <table name="parameter_definitions"/>
+        <discriminator-value>ByteArray</discriminator-value>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+        </attributes>
+    </entity>
 </entity-mappings>

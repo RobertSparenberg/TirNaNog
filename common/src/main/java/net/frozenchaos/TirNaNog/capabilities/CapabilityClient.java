@@ -91,12 +91,10 @@ public class CapabilityClient extends Thread {
 
     private void processXml(String xml) {
         try {
-            ParameterSet parameterSet = JAXB.unmarshal(new StringReader(xml), ParameterSet.class);
-            for(Parameter parameter : parameterSet.getParameters()) {
-                for(ParameterProcessor processor : processors) {
-                    if(processor.canProcess(parameter)) {
-                        processor.processParamter(parameter);
-                    }
+            Parameter parameter = JAXB.unmarshal(new StringReader(xml), Parameter.class);
+            for(ParameterProcessor processor : processors) {
+                if(processor.canProcess(parameter)) {
+                    processor.processParamter(parameter);
                 }
             }
         } catch(Exception e) {

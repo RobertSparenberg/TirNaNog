@@ -4,9 +4,9 @@ import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.automation.Function;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
-public class SendVariableToParameter extends Action {
+public class SendValueToParameter extends Action {
     private String parameterPath = "";
-    private String variableName = "";
+    private String value = "";
 
     @Override
     public void perform(Parameter parameter, Function function, AutomationControl automationControl) {
@@ -20,11 +20,11 @@ public class SendVariableToParameter extends Action {
         this.parameterPath = parameterPath;
     }
 
-    public String getVariableName() {
-        return variableName;
+    public String getValue() {
+        return value;
     }
 
-    public void setVariableName(String variableName) {
-        this.variableName = variableName;
+    public void setValue(String value) {
+        this.value = value;
     }
 }

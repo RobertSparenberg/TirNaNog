@@ -13,6 +13,9 @@ public class Function {
     private Map<String, Object> variables = new HashMap<>();
     private Record record = null;
 
+    private String name = "New Automation Function";
+    private boolean active = false;
+
     public void onParameter(Parameter parameter, AutomationControl automationControl) {
         for(Rule rule : rules) {
             rule.onParameter(parameter, this, automationControl);
@@ -41,5 +44,21 @@ public class Function {
 
     public void setRecord(Record record) {
         this.record = record;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public boolean isActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

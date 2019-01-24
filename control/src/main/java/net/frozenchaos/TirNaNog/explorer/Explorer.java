@@ -1,6 +1,5 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.capabilities.CapabilityServer;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.slf4j.Logger;
@@ -21,8 +20,8 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ModuleConfigRepository moduleConfigRepository;
+    private final OwnConfigService ownConfigService;
     private final Timer timer;
-    private final CapabilityServer capabilityServer;
     private final Properties properties;
 
     private Broadcaster broadcaster;
@@ -31,9 +30,9 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Autowired
-    public Explorer(ModuleConfigRepository moduleConfigRepository, CapabilityServer capabilityServer, Timer timer, Properties properties) {
+    public Explorer(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, Timer timer, Properties properties) {
         this.moduleConfigRepository = moduleConfigRepository;
-        this.capabilityServer = capabilityServer;
+        this.ownConfigService = ownConfigService;
         this.timer = timer;
         this.properties = properties;
     }
@@ -44,7 +43,7 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
             logger.info("Initializing TirNaNog device explorer");
             try {
 //                telephone = new Telephone(moduleConfigRepository, capabilityServer, timer);
-                broadcaster = new Broadcaster(moduleConfigRepository, capabilityServer, timer, properties);
+                broadcaster = new Broadcaster(moduleConfigRepository, ownConfigService, timer, properties);
                 started = true;
                 logger.info("TirNaNog device explorer initialized");
             } catch(Exception e) {

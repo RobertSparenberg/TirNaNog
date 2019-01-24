@@ -4,13 +4,13 @@ import net.frozenchaos.TirNaNog.automation.actions.Action;
 import net.frozenchaos.TirNaNog.automation.triggers.Trigger;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
-import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 public class Rule {
-    private String name;
-    private List<Trigger> triggers = new ArrayList<>();
-    private List<Action> actions = new ArrayList<>();
+    private int order;
+    private List<Trigger> triggers = new LinkedList<>();
+    private List<Action> actions = new LinkedList<>();
 
     public void onParameter(Parameter parameter, Function function, AutomationControl automationControl) {
         for(Trigger trigger : triggers) {
@@ -22,12 +22,12 @@ public class Rule {
         }
     }
 
-    public String getName() {
-        return name;
+    public int getOrder() {
+        return order;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setOrder(int order) {
+        this.order = order;
     }
 
     public List<Trigger> getTriggers() {

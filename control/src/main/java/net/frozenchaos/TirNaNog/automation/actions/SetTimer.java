@@ -18,10 +18,15 @@ public class SetTimer extends Action {
                 @Override
                 public void doTask() {
                     synchronized(function) {
-                        function.onParameter(new Parameter("localhost.timer." + name) {
+                        function.onParameter(new Parameter<Long>(automationControl.getOwnModuleConfig().getName() + ".timer." + name) {
                             @Override
                             protected boolean matchesTypeOfDefinition(ParameterDefinition parameterDefinition) {
                                 return parameterDefinition instanceof TimerParameterDefinition && parameterDefinition.getName().equals("localhost.timer." + name);
+                            }
+
+                            @Override
+                            public Long getValue() {
+                                return automationControl.getTimer().getTime();
                             }
                         }, automationControl);
                     }

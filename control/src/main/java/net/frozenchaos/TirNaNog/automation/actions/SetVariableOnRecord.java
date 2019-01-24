@@ -5,19 +5,16 @@ import net.frozenchaos.TirNaNog.automation.Function;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.data.Record;
 
-public class OpenRecord extends Action {
-    private String name = "Unnamed Record";
+public class SetVariableOnRecord extends Action {
+    private String name = "Unknown";
+    private String variableName = "Unknown";
 
     @Override
     public void perform(Parameter parameter, Function function, AutomationControl automationControl) {
-        function.setRecord(new Record());
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
+        Record record = function.getRecord();
+        Object variable = function.getVariable(variableName);
+        if(record != null && variable != null) {
+            record.setValue(name, variable);
+        }
     }
 }

@@ -1,7 +1,5 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
-import net.frozenchaos.TirNaNog.capabilities.CapabilityServer;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
@@ -17,7 +15,6 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.List;
 import java.util.Properties;
 
 /**
@@ -27,16 +24,13 @@ import java.util.Properties;
 public class Broadcaster {
     private static final int BROADCAST_PORT = 42001;
     private static final String REBROADCAST_DELAY_PROPERTY = "net.frozenchaos.TirNaNog.broadcast_delay";
-    private static final String MODULE_NAME_PROPERTY = "net.frozenchaos.TirNaNog.module_name";
     private final int REBROADCAST_DELAY = 41000;
-    private final int MODULE_NAME = 41000;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
-    private final CapabilityServer capabilityServer;
+    private final OwnConfigService ownConfigService;
 //    private final Telephone telephone;
 
-    private final ModuleConfig ownConfig;
     private final DatagramSocket broadcastSocket;
     private final DatagramSocket listenSocket;
     private final InetAddress broadcastAddress;
@@ -44,10 +38,10 @@ public class Broadcaster {
 
     private boolean stopRequested = false;
 
-    public Broadcaster(ModuleConfigRepository moduleConfigRepository, CapabilityServer capabilityServer, Timer timer, Properties properties) throws IOException, JAXBException {
+    public Broadcaster(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, Timer timer, Properties properties) throws IOException, JAXBException {
+        this.ownConfigService = ownConfigService;
         logger.trace("Broadcaster initializing");
         this.moduleConfigRepository = moduleConfigRepository;
-        this.capabilityServer = capabilityServer;
 //        this.telephone = telephone;
 
         broadcastSocket = new DatagramSocket();
@@ -55,15 +49,17 @@ public class Broadcaster {
         broadcastSocket.setReuseAddress(true);
         broadcastAddress = InetAddress.getByName("192.168.1.255");
 
-        String name = properties.getProperty(MODULE_NAME_PROPERTY, "Unknown");
-        ownConfig = new ModuleConfig(name, "localhost", false);
-        logger.info("Broadcaster is setting own module config to: " + ownConfig);
-
         listenSocket = new DatagramSocket(BROADCAST_PORT);
         listenThread = new Thread(this::receiveBroadcast);
         listenThread.start();
 
-        ScheduledTask broadcastTask = new ScheduledTask(REBROADCAST_DELAY) {
+        int rebroadcastDelay;
+        try {
+            rebroadcastDelay = Integer.valueOf(properties.getProperty(REBROADCAST_DELAY_PROPERTY));
+        } catch(NumberFormatException ignored) {
+            rebroadcastDelay = REBROADCAST_DELAY;
+        }
+        ScheduledTask broadcastTask = new ScheduledTask(rebroadcastDelay) {
             @Override
             public void doTask() {
                 try {
@@ -81,6 +77,7 @@ public class Broadcaster {
     }
 
     private void receiveBroadcast() {
+        String ownModuleName = ownConfigService.getOwnConfig().getName();
         while(!stopRequested) {
             try {
                 byte[] buffer = new byte[1024];
@@ -89,7 +86,7 @@ public class Broadcaster {
                 if(!stopRequested) {
                     //todo: find a simpler way to unmarshal the string
                     ModuleConfig moduleConfig = JAXB.unmarshal(new StringReader(new String(buffer).trim()), ModuleConfig.class);
-                    if(!ownConfig.getName().equals(moduleConfig.getName())) {
+                    if(!ownModuleName.equals(moduleConfig.getName())) {
                         moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
                         moduleConfig.setIp(receivedBroadcast.getAddress().getHostAddress());
                         logger.trace("Broadcaster saving moduleconfig: "+moduleConfig.toString());
@@ -113,14 +110,8 @@ public class Broadcaster {
     }
 
     private byte[] getMarshaledOwnConfig() {
-
-        List<CapabilityApplication> capabilityApplicationsList = capabilityServer.getCapabilityApplications();
-        CapabilityApplication capabilityApplications[] = new CapabilityApplication[capabilityApplicationsList.size()];
-        capabilityApplicationsList.toArray(capabilityApplications);
-
-        ownConfig.setCapabilityApplications(capabilityApplications);
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        JAXB.marshal(ownConfig, outputStream);
+        JAXB.marshal(ownConfigService.getOwnConfig(), outputStream);
         return outputStream.toByteArray();
     }
 

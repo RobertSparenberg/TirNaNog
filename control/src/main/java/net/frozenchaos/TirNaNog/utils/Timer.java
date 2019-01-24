@@ -118,4 +118,8 @@ public class Timer implements Runnable {
         }
         return this.lastTimeMillis;
     }
+
+    public long getTime() {
+        return System.currentTimeMillis();
+    }
 }
