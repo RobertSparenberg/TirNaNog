@@ -44,6 +44,10 @@
         </attributes>
     </entity>
 
+
+
+    <!-- Triggers -->
+
     <entity class="net.frozenchaos.TirNaNog.automation.triggers.Trigger" name="Trigger">
         <table name="automation_triggers"/>
         <discriminator-column name="trigger_type" discriminator-type="STRING"/>
@@ -61,7 +65,7 @@
         </attributes>
     </entity>
 
-    <entity class="net.frozenchaos.TirNaNog.automation.ExactValueTrigger" name="Trigger">
+    <entity class="net.frozenchaos.TirNaNog.automation.triggers.ExactValueTrigger" name="Trigger">
         <table name="automation_triggers"/>
         <discriminator-value>ExactValue</discriminator-value>
         <attributes>
@@ -71,7 +75,7 @@
         </attributes>
     </entity>
 
-    <entity class="net.frozenchaos.TirNaNog.automation.ValueRangeTrigger" name="Trigger">
+    <entity class="net.frozenchaos.TirNaNog.automation.triggers.ValueRangeTrigger" name="Trigger">
         <table name="automation_triggers"/>
         <discriminator-value>ValueRange</discriminator-value>
         <attributes>
@@ -94,6 +98,10 @@
             </id>
         </attributes>
     </entity>
+
+
+
+    <!-- Actions -->
 
     <entity class="net.frozenchaos.TirNaNog.automation.actions.CloseRecord" name="CloseRecord">
         <table name="automation_actions"/>
@@ -179,6 +187,75 @@
             <basic name="name">
                 <column name="name" nullable="false"/>
             </basic>
+            <basic name="value">
+                <column name="value" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+
+
+    <!-- Records -->
+
+    <entity class="net.frozenchaos.TirNaNog.data.Record" name="Record">
+        <table name="records_record"/>
+        <attributes>
+            <id name="id">
+                <column name="id" unique="true" nullable="false"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="name">
+                <column name="name" nullable="false"/>
+            </basic>
+            <basic name="timestamp">
+                <column name="timestamp" nullable="false"/>
+            </basic>
+            <one-to-many name="values" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.data.RecordValue">
+                <order-column name="order" updatable="true" nullable="false"/>
+                <join-column name="owning_record" referenced-column-name="id" nullable="false"/>
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.data.RecordValue" name="RecordValue">
+        <table name="records_record_value"/>
+        <discriminator-column name="value_type" discriminator-type="STRING"/>
+        <attributes>
+            <id name="id">
+                <column name="id" unique="true" nullable="false"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="timestamp">
+                <column name="timestamp" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.data.IntegerRecordValue" name="IntegerRecordValue">
+        <table name="records_record_value"/>
+        <discriminator-value>Integer</discriminator-value>
+        <attributes>
+            <basic name="value">
+                <column name="value" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.data.ByteArrayRecordValue" name="ByteArrayRecordValue">
+        <table name="records_record_value"/>
+        <discriminator-value>ByteArray</discriminator-value>
+        <attributes>
+            <basic name="value">
+                <column name="value" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.data.StringRecordValue" name="StringRecordValue">
+        <table name="records_record_value"/>
+        <discriminator-value>String</discriminator-value>
+        <attributes>
             <basic name="value">
                 <column name="value" nullable="false"/>
             </basic>

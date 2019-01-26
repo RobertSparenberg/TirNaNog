@@ -8,6 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class Rule {
+    private long id;
     private int order;
     private List<Trigger> triggers = new LinkedList<>();
     private List<Action> actions = new LinkedList<>();
@@ -20,6 +21,14 @@ public class Rule {
                 }
             }
         }
+    }
+
+    public long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public int getOrder() {

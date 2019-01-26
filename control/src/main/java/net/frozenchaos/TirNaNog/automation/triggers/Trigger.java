@@ -1,20 +1,19 @@
 package net.frozenchaos.TirNaNog.automation.triggers;
 
-import net.frozenchaos.TirNaNog.automation.Rule;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
 public abstract class Trigger {
-    private Rule rule;
+    private long id;
     private String parameterPath;
 
     public abstract boolean isTriggered(Parameter parameter);
 
-    public Rule getRule() {
-        return rule;
+    public long getId() {
+        return id;
     }
 
-    public void setRule(Rule rule) {
-        this.rule = rule;
+    public void setId(long id) {
+        this.id = id;
     }
 
     public String getParameterPath() {
