@@ -2,6 +2,8 @@ package net.frozenchaos.TirNaNog.capabilities;
 
 import net.frozenchaos.TirNaNog.capabilities.parameters.ParameterDefinition;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -22,6 +24,8 @@ public class Capability {
         this.name = name;
     }
 
+    @XmlElementWrapper(name = "parameterDefinitions")
+    @XmlElement(name = "parameterDefinition")
     public List<ParameterDefinition> getParameterDefinitions() {
         return parameterDefinitions;
     }

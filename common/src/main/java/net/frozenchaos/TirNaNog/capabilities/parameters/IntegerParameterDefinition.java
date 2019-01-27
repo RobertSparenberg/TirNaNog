@@ -1,10 +1,16 @@
 package net.frozenchaos.TirNaNog.capabilities.parameters;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
+@XmlRootElement
 public class IntegerParameterDefinition extends ParameterDefinition {
     private int rangeMinimum;
     private int rangeMaximum;
+
+    public IntegerParameterDefinition() {
+        super("Unknown IntegerParameterDefinition", ParameterType.OUTPUT);
+    }
 
     public IntegerParameterDefinition(String name, ParameterType parameterType, int rangeMinimum, int rangeMaximum) {
         super(name, parameterType);

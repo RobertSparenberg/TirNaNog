@@ -19,7 +19,7 @@ class CapabilityThread extends Thread {
     private final AutomationControl automationControl;
 
     private Socket socket;
-    private CapabilityApplication profile = null;
+    private CapabilityApplication profile = new CapabilityApplication("Unknown");
     private boolean stopRequested;
 
     CapabilityThread(Socket socket, OwnCapabilityApplicationsService capabilityApplicationService, AutomationControl automationControl) {

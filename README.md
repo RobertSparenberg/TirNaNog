@@ -14,3 +14,26 @@ Sudo is needed as it will make the administration pages available on port 80, wh
 
 Run the project in debug from src directory: sudo java -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=5005 -jar target/TirNaNog-Control-0.1-SNAPSHOT.jar
 It will wait until the debugger has attached to port 5005
+
+
+
+# XML specs
+
+CapabilityApplication declaration that should be sent to the TirNaNog application running on port 42000
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<capabilityApplication>
+    <name>CatCoop</name>
+    <capabilities>
+        <name>Door</name>
+        <parameterDefinitions>
+            <parameterDefinition xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:type="enumParameterDefinition">
+                <name>Open</name>
+                <parameterType>INPUT</parameterType>
+                <values>
+                    <value>Close</value>
+                    <value>Open</value>
+                </values>
+            </parameterDefinition>
+        </parameterDefinitions>
+    </capabilities>
+</capabilityApplication>

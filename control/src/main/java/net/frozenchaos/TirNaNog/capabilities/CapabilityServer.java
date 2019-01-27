@@ -4,31 +4,24 @@ import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationListener;
-import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 @Service
-public class CapabilityServer implements ApplicationListener<ContextRefreshedEvent> {
-    private static final int SOCKET_TIMEOUT = 5000;
+public class CapabilityServer {
     private static final long CAPABILITY_SHUTDOWN_TIMEOUT = 2000;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final AutomationControl automationControl;
     private final OwnCapabilityApplicationsService capabilityApplicationsService;
-    private final List<CapabilityThread> runningCapabilities = new ArrayList<>();
     private final Thread acceptConnectionsThread;
     private ServerSocket serverSocket;
 
-    private AtomicBoolean stopRequested = new AtomicBoolean(false);
+    private boolean stopRequested = false;
 
     @Autowired
     public CapabilityServer(AutomationControl automationControl, OwnCapabilityApplicationsService capabilityApplicationsService) {
@@ -37,21 +30,27 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
         this.automationControl = automationControl;
         this.acceptConnectionsThread = new Thread(this::acceptConnections);
         this.acceptConnectionsThread.start();
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
         logger.info("Capability Server initialized");
     }
 
     private void acceptConnections() {
         try {
             serverSocket = new ServerSocket(CapabilityClient.CAPABILITIES_PORT);
-            serverSocket.setSoTimeout(SOCKET_TIMEOUT);
-            while(!stopRequested.get()) {
+            logger.trace("Capability server socket created");
+            while(!stopRequested) {
                 try {
+                    logger.trace("Waiting for a connection to the capability server socket...");
                     Socket capabilitySocket = serverSocket.accept();
+                    logger.trace("Registering new Capability application");
                     startCapabilityThread(capabilitySocket);
                 } catch(SocketTimeoutException ignored) {
                 }
             }
         } catch(Exception e) {
+            if(!stopRequested) {
+                logger.error("Fatal error in capability server socket: "+e.toString());
+            }
             try {
                 serverSocket.close();
             } catch(IOException ignored) {
@@ -60,32 +59,27 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
     }
 
     private void startCapabilityThread(Socket capabilitySocket) {
-        logger.info("Registering new Capability application");
         CapabilityThread capabilityThread;
-        if(!stopRequested.get()) {
+        if(!stopRequested) {
             capabilityThread = new CapabilityThread(capabilitySocket, capabilityApplicationsService, automationControl);
             capabilityApplicationsService.addCapabilityApplication(capabilityThread);
             capabilityThread.start();
         }
     }
 
-    @Override
-    public void onApplicationEvent(ContextRefreshedEvent contextRefreshedEvent) {
-        stopRequested.set(true);
+    private void shutdown() {
+        logger.debug("Shutting down capability server");
+        stopRequested = true;
         try {
-            acceptConnectionsThread.join(SOCKET_TIMEOUT + 1000);
+            if(serverSocket != null) {
+                serverSocket.close();
+            }
+            acceptConnectionsThread.join(CAPABILITY_SHUTDOWN_TIMEOUT);
         } catch(Exception ignored) {
         }
-        synchronized(runningCapabilities) {
-            for(int i = runningCapabilities.size()-1; i >= 0; i--) {
-                CapabilityThread capability = runningCapabilities.get(i);
-                capability.stopGracefully();
-                try {
-                    capability.join(CAPABILITY_SHUTDOWN_TIMEOUT);
-                } catch(InterruptedException ignored) {
-                }
-                runningCapabilities.remove(i);
-            }
+        capabilityApplicationsService.setStopRequested();
+        for(CapabilityThread capability : capabilityApplicationsService.getRunningCapabilities()) {
+            capabilityApplicationsService.removeCapabilityApplication(capability);
         }
     }
 }

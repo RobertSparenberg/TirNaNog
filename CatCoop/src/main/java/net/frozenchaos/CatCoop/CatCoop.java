@@ -30,6 +30,7 @@ public class CatCoop extends TirNaNogCapabilityBase {
     protected List<Capability> getCapabilities() {
         List<Capability> capabilities = new ArrayList<>();
         capabilities.add(createCapability("Door", doorInputParameterDefinition));
+        logger.info("Found " + capabilities.size() + " capabilities");
         return capabilities;
     }
 
@@ -43,6 +44,7 @@ public class CatCoop extends TirNaNogCapabilityBase {
                 logger.info("New value received for parameter '" + doorInputParameterDefinition.getName() + "' value: '" + enumParameter.getValue() + '\'');
             }
         });
+        logger.info("Found " + processors.size() + " parameter processors");
         return processors;
     }
 

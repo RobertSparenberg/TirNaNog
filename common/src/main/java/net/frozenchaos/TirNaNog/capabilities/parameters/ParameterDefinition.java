@@ -1,7 +1,11 @@
 package net.frozenchaos.TirNaNog.capabilities.parameters;
 
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlSeeAlso;
+import javax.xml.bind.annotation.XmlType;
 
+@XmlSeeAlso({ByteArrayParameterDefinition.class, EnumParameterDefinition.class, IntegerParameterDefinition.class})
+@XmlType
 public abstract class ParameterDefinition {
     private String name;
     private ParameterType parameterType;

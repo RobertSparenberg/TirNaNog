@@ -42,7 +42,7 @@ public class CapabilityClient extends Thread {
                 logger.debug("Connected; capability profile sent");
             } catch(IOException e) {
                 try {
-                    logger.info("Failed to connect to the local TirNaNog control application");
+                    logger.info("Failed to connect to the local TirNaNog control application: " + e.toString());
                     socket = null;
                     Thread.sleep(5000);
                 } catch(InterruptedException ignored) {

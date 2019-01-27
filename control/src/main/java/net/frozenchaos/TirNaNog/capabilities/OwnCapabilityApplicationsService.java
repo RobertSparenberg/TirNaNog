@@ -8,6 +8,7 @@ import java.util.List;
 @Service
 public class OwnCapabilityApplicationsService {
     private final List<CapabilityThread> runningCapabilities = new ArrayList<>();
+    private boolean stopRequested = false;
 
     public synchronized List<CapabilityApplication> getCapabilityApplications() {
         synchronized(runningCapabilities) {
@@ -19,11 +20,21 @@ public class OwnCapabilityApplicationsService {
         }
     }
 
+    synchronized List<CapabilityThread> getRunningCapabilities() {
+        return new ArrayList<>(runningCapabilities);
+    }
+
     synchronized void removeCapabilityApplication(CapabilityThread capability) {
         runningCapabilities.remove(capability);
     }
 
     synchronized void addCapabilityApplication(CapabilityThread capability) {
-        runningCapabilities.add(capability);
+        if(!stopRequested) {
+            runningCapabilities.add(capability);
+        }
+    }
+
+    public void setStopRequested() {
+        stopRequested = true;
     }
 }
