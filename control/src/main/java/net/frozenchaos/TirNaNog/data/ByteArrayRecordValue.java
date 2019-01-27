@@ -1,6 +1,6 @@
 package net.frozenchaos.TirNaNog.data;
 
-public class ByteArrayRecordValue extends RecordValue<byte[]> {
+public class ByteArrayRecordValue extends RecordValue {
     private byte[] value;
 
     public ByteArrayRecordValue() {
@@ -12,12 +12,10 @@ public class ByteArrayRecordValue extends RecordValue<byte[]> {
         this.value = value;
     }
 
-    @Override
     public byte[] getValue() {
         return value;
     }
 
-    @Override
     public void setValue(byte[] value) {
         this.value = value;
     }

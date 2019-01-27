@@ -6,6 +6,46 @@
     <description>TirNaNog ORM Mappings - Includes mappings for Common</description>
     <package>net.frozenchaos.TirNaNog</package>
 
+    <!-- Abstract Entities -->
+
+    <entity class="net.frozenchaos.TirNaNog.automation.triggers.Trigger">
+        <table name="automation_triggers"/>
+        <attributes>
+            <id name="id">
+                <column name="trigger_id" unique="true" nullable="false"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="parameterPath">
+                <column name="parameter_path"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.automation.actions.Action">
+        <table name="automation_actions"/>
+        <attributes>
+            <id name="id">
+                <column name="action_id" unique="true" nullable="false"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.data.RecordValue">
+        <table name="records_record_value"/>
+        <attributes>
+            <id name="id">
+                <column name="record_value_id" unique="true" nullable="false"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="timestamp">
+                <column name="timestamp" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+
+
     <!-- TirNaNog-Control mappings for automation -->
 
     <entity class="net.frozenchaos.TirNaNog.automation.Function" name="Function">
@@ -21,6 +61,7 @@
                 <join-column name="owning_function" referenced-column-name="name" nullable="false"/>
                 <cascade><cascade-all/></cascade>
             </one-to-many>
+            <transient name="record"/>
         </attributes>
     </entity>
 
@@ -28,17 +69,17 @@
         <table name="automation_rules"/>
         <attributes>
             <id name="id">
-                <column name="id" unique="true" nullable="false"/>
+                <column name="rule_id" unique="true" nullable="false"/>
                 <generated-value strategy="IDENTITY"/>
             </id>
             <one-to-many name="triggers" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.automation.triggers.Trigger">
-                <order-column name="order" updatable="true" nullable="false"/>
-                <join-column name="owning_rule" referenced-column-name="name" nullable="false"/>
+                <order-column name="trigger_order"/>
+                <join-column name="owning_rule" referenced-column-name="rule_id" nullable="false"/>
                 <cascade><cascade-all/></cascade>
             </one-to-many>
             <one-to-many name="actions" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.automation.actions.Action">
-                <order-column name="order" updatable="true" nullable="false"/>
-                <join-column name="owning_rule" referenced-column-name="id" nullable="false"/>
+                <order-column name="action_order"/>
+                <join-column name="owning_rule" referenced-column-name="rule_id" nullable="false"/>
                 <cascade><cascade-all/></cascade>
             </one-to-many>
         </attributes>
@@ -48,26 +89,10 @@
 
     <!-- Triggers -->
 
-    <entity class="net.frozenchaos.TirNaNog.automation.triggers.Trigger" name="Trigger">
-        <table name="automation_triggers"/>
-        <discriminator-column name="trigger_type" discriminator-type="STRING"/>
-        <attributes>
-            <id name="id">
-                <column name="id" unique="true" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
-            </id>
-            <basic name="order">
-                <column name="order" nullable="false" updatable="true"/>
-            </basic>
-            <basic name="parameterPath">
-                <column name="parameter_path"/>
-            </basic>
-        </attributes>
-    </entity>
-
     <entity class="net.frozenchaos.TirNaNog.automation.triggers.ExactValueTrigger" name="Trigger">
         <table name="automation_triggers"/>
         <discriminator-value>ExactValue</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="valueToMatch">
                 <column name="value_to_match" nullable="false"/>
@@ -78,6 +103,7 @@
     <entity class="net.frozenchaos.TirNaNog.automation.triggers.ValueRangeTrigger" name="Trigger">
         <table name="automation_triggers"/>
         <discriminator-value>ValueRange</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="minimumValueRange">
                 <column name="minimum_value_range" nullable="false"/>
@@ -88,17 +114,6 @@
         </attributes>
     </entity>
 
-    <entity class="net.frozenchaos.TirNaNog.automation.actions.Action" name="Action">
-        <table name="automation_actions"/>
-        <discriminator-column name="action_type" discriminator-type="STRING"/>
-        <attributes>
-            <id name="id">
-                <column name="id" unique="true" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
-            </id>
-        </attributes>
-    </entity>
-
 
 
     <!-- Actions -->
@@ -106,11 +121,13 @@
     <entity class="net.frozenchaos.TirNaNog.automation.actions.CloseRecord" name="CloseRecord">
         <table name="automation_actions"/>
         <discriminator-value>CloseRecord</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
     </entity>
 
     <entity class="net.frozenchaos.TirNaNog.automation.actions.OpenRecord" name="OpenRecord">
         <table name="automation_actions"/>
         <discriminator-value>OpenRecord</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="name">
                 <column name="name" nullable="false"/>
@@ -121,6 +138,7 @@
     <entity class="net.frozenchaos.TirNaNog.automation.actions.SendValueToParameter" name="SendValueToParameter">
         <table name="automation_actions"/>
         <discriminator-value>SendValueToParameter</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="parameterPath">
                 <column name="parameter_path" nullable="false"/>
@@ -134,6 +152,7 @@
     <entity class="net.frozenchaos.TirNaNog.automation.actions.SendVariableToParameter" name="SendVariableToParameter">
         <table name="automation_actions"/>
         <discriminator-value>SendVariableToParameter</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="parameterPath">
                 <column name="parameter_path" nullable="false"/>
@@ -147,6 +166,7 @@
     <entity class="net.frozenchaos.TirNaNog.automation.actions.SetTimer" name="SetTimer">
         <table name="automation_actions"/>
         <discriminator-value>SetTimer</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="name">
                 <column name="name" nullable="false"/>
@@ -160,6 +180,7 @@
     <entity class="net.frozenchaos.TirNaNog.automation.actions.SetVariableOnRecord" name="SetVariableOnRecord">
         <table name="automation_actions"/>
         <discriminator-value>SetVariableOnRecord</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="name">
                 <column name="name" nullable="false"/>
@@ -173,6 +194,7 @@
     <entity class="net.frozenchaos.TirNaNog.automation.actions.SetVariableToParameter" name="SetVariableToParameter">
         <table name="automation_actions"/>
         <discriminator-value>SetVariableToParameter</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="name">
                 <column name="name" nullable="false"/>
@@ -183,6 +205,7 @@
     <entity class="net.frozenchaos.TirNaNog.automation.actions.SetVariableToValue" name="SetVariableToValue">
         <table name="automation_actions"/>
         <discriminator-value>SetVariableToValue</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="name">
                 <column name="name" nullable="false"/>
@@ -201,7 +224,7 @@
         <table name="records_record"/>
         <attributes>
             <id name="id">
-                <column name="id" unique="true" nullable="false"/>
+                <column name="record_id" unique="true" nullable="false"/>
                 <generated-value strategy="IDENTITY"/>
             </id>
             <basic name="name">
@@ -211,30 +234,17 @@
                 <column name="timestamp" nullable="false"/>
             </basic>
             <one-to-many name="values" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.data.RecordValue">
-                <order-column name="order" updatable="true" nullable="false"/>
-                <join-column name="owning_record" referenced-column-name="id" nullable="false"/>
+                <order-column name="value_order" updatable="true" nullable="false"/>
+                <join-column name="owning_record" referenced-column-name="record_id" nullable="false"/>
                 <cascade><cascade-all/></cascade>
             </one-to-many>
-        </attributes>
-    </entity>
-
-    <entity class="net.frozenchaos.TirNaNog.data.RecordValue" name="RecordValue">
-        <table name="records_record_value"/>
-        <discriminator-column name="value_type" discriminator-type="STRING"/>
-        <attributes>
-            <id name="id">
-                <column name="id" unique="true" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
-            </id>
-            <basic name="timestamp">
-                <column name="timestamp" nullable="false"/>
-            </basic>
         </attributes>
     </entity>
 
     <entity class="net.frozenchaos.TirNaNog.data.IntegerRecordValue" name="IntegerRecordValue">
         <table name="records_record_value"/>
         <discriminator-value>Integer</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="value">
                 <column name="value" nullable="false"/>
@@ -245,9 +255,10 @@
     <entity class="net.frozenchaos.TirNaNog.data.ByteArrayRecordValue" name="ByteArrayRecordValue">
         <table name="records_record_value"/>
         <discriminator-value>ByteArray</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="value">
-                <column name="value" nullable="false"/>
+                <column name="blobValue" nullable="false"/>
             </basic>
         </attributes>
     </entity>
@@ -255,6 +266,7 @@
     <entity class="net.frozenchaos.TirNaNog.data.StringRecordValue" name="StringRecordValue">
         <table name="records_record_value"/>
         <discriminator-value>String</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <basic name="value">
                 <column name="value" nullable="false"/>

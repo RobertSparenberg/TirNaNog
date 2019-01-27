@@ -1,15 +1,20 @@
 package net.frozenchaos.TirNaNog.data;
 
-public abstract class RecordValue<T> {
+public abstract class RecordValue {
     private long timestamp = -1;
+    private int id;
 
     protected RecordValue() {
         timestamp = System.currentTimeMillis();
     }
 
-    public abstract T getValue();
+    public int getId() {
+        return id;
+    }
 
-    public abstract void setValue(T value);
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public long getTimestamp() {
         return timestamp;

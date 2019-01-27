@@ -6,6 +6,23 @@
     <description>TirNaNog ORM Mappings - Includes mappings for Common</description>
     <package>net.frozenchaos.TirNaNog</package>
 
+    <!-- Abstract entities -->
+
+    <entity class="net.frozenchaos.TirNaNog.capabilities.parameters.ParameterDefinition">
+        <table name="parameter_definitions"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false"/>
+            </id>
+            <basic name="parameterType">
+                <column name="paramater_type" nullable="false"/>
+                <enumerated>STRING</enumerated>
+            </basic>
+        </attributes>
+    </entity>
+
+
+
     <!-- TirNaNog-Control mappings -->
 
     <entity class="net.frozenchaos.TirNaNog.data.ModuleConfig" name="ModuleConfig">
@@ -60,27 +77,11 @@
         </attributes>
     </entity>
 
-    <entity class="net.frozenchaos.TirNaNog.capabilities.parameters.ParameterDefinition" name="ParameterDefinition">
-        <table name="parameter_definitions"/>
-        <discriminator-column name="parameter_type" discriminator-type="STRING"/>
-        <attributes>
-            <id name="name">
-                <column name="name" unique="true" nullable="false"/>
-            </id>
-            <basic name="parameterType">
-                <column name="paramater_type" nullable="false"/>
-                <enumerated>STRING</enumerated>
-            </basic>
-        </attributes>
-    </entity>
-
     <entity class="net.frozenchaos.TirNaNog.capabilities.parameters.IntegerParameterDefinition">
         <table name="parameter_definitions"/>
         <discriminator-value>Integer</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
-            <id name="name">
-                <column name="name" unique="true" nullable="false"/>
-            </id>
             <basic name="rangeMinimum">
                 <column name="range_minimum" nullable="false"/>
             </basic>
@@ -93,13 +94,8 @@
     <entity class="net.frozenchaos.TirNaNog.capabilities.parameters.EnumParameterDefinition">
         <table name="parameter_definitions"/>
         <discriminator-value>Enum</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
-            <id name="name">
-                <column name="name" unique="true" nullable="false"/>
-            </id>
-            <basic name="value">
-                <column name="range_minimum" nullable="false"/>
-            </basic>
             <element-collection name="values" target-class="java.lang.String">
                 <column name="value" />
                 <collection-table name="parameter_definition_enum_values">
@@ -112,6 +108,7 @@
     <entity class="net.frozenchaos.TirNaNog.capabilities.parameters.ByteArrayParameterDefinition">
         <table name="parameter_definitions"/>
         <discriminator-value>ByteArray</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
             <id name="name">
                 <column name="name" unique="true" nullable="false"/>

@@ -1,6 +1,6 @@
 package net.frozenchaos.TirNaNog.data;
 
-public class IntegerRecordValue extends RecordValue<Integer> {
+public class IntegerRecordValue extends RecordValue {
     private Integer value;
 
     public IntegerRecordValue() {
@@ -12,12 +12,10 @@ public class IntegerRecordValue extends RecordValue<Integer> {
         this.value = value;
     }
 
-    @Override
     public Integer getValue() {
         return value;
     }
 
-    @Override
     public void setValue(Integer value) {
         this.value = value;
     }
