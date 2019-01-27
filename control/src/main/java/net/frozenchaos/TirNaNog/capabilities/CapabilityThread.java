@@ -15,16 +15,16 @@ import java.net.Socket;
 
 class CapabilityThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final CapabilityServer capabilityServer;
+    private final OwnCapabilityApplicationsService capabilityApplicationService;
     private final AutomationControl automationControl;
 
     private Socket socket;
     private CapabilityApplication profile = null;
     private boolean stopRequested;
 
-    CapabilityThread(Socket socket, CapabilityServer capabilityServer, AutomationControl automationControl) {
+    CapabilityThread(Socket socket, OwnCapabilityApplicationsService capabilityApplicationService, AutomationControl automationControl) {
         this.socket = socket;
-        this.capabilityServer = capabilityServer;
+        this.capabilityApplicationService = capabilityApplicationService;
         this.automationControl = automationControl;
     }
 
@@ -64,7 +64,7 @@ class CapabilityThread extends Thread {
             }
         } catch(Exception e) {
             logger.error("Error on CapabilityThread with name '"+getCapabilityName()+"'", e);
-            capabilityServer.removeCapability(this);
+            capabilityApplicationService.removeCapabilityApplication(this);
         }
     }
 

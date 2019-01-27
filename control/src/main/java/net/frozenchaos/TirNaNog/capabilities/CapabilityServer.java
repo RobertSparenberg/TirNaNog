@@ -23,6 +23,7 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final AutomationControl automationControl;
+    private final OwnCapabilityApplicationsService capabilityApplicationsService;
     private final List<CapabilityThread> runningCapabilities = new ArrayList<>();
     private final Thread acceptConnectionsThread;
     private ServerSocket serverSocket;
@@ -30,22 +31,13 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
     private AtomicBoolean stopRequested = new AtomicBoolean(false);
 
     @Autowired
-    public CapabilityServer(AutomationControl automationControl) {
+    public CapabilityServer(AutomationControl automationControl, OwnCapabilityApplicationsService capabilityApplicationsService) {
+        this.capabilityApplicationsService = capabilityApplicationsService;
         logger.info("Capability Server initializing");
         this.automationControl = automationControl;
         this.acceptConnectionsThread = new Thread(this::acceptConnections);
         this.acceptConnectionsThread.start();
         logger.info("Capability Server initialized");
-    }
-
-    public List<CapabilityApplication> getCapabilityApplications() {
-        synchronized(runningCapabilities) {
-            List<CapabilityApplication> capabilityApplications = new ArrayList<>(runningCapabilities.size());
-            for(CapabilityThread thread : runningCapabilities) {
-               capabilityApplications.add(thread.getProfile());
-            }
-            return capabilityApplications;
-        }
     }
 
     private void acceptConnections() {
@@ -70,20 +62,10 @@ public class CapabilityServer implements ApplicationListener<ContextRefreshedEve
     private void startCapabilityThread(Socket capabilitySocket) {
         logger.info("Registering new Capability application");
         CapabilityThread capabilityThread;
-        synchronized(runningCapabilities) {
-            if(!stopRequested.get()) {
-                capabilityThread = new CapabilityThread(capabilitySocket, this, automationControl);
-                runningCapabilities.add(capabilityThread);
-                capabilityThread.start();
-            }
-        }
-    }
-
-    void removeCapability(CapabilityThread capability) {
-        if(!this.stopRequested.get()) {
-            synchronized(runningCapabilities) {
-                runningCapabilities.remove(capability);
-            }
+        if(!stopRequested.get()) {
+            capabilityThread = new CapabilityThread(capabilitySocket, capabilityApplicationsService, automationControl);
+            capabilityApplicationsService.addCapabilityApplication(capabilityThread);
+            capabilityThread.start();
         }
     }
 
