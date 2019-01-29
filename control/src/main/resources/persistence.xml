@@ -6,6 +6,7 @@
         <mapping-file>TirNaNog-Global-orm.xml</mapping-file>
         <mapping-file>TirNaNog-Basic-orm.xml</mapping-file>
         <mapping-file>TirNaNog-Automation-orm.xml</mapping-file>
+        <mapping-file>TirNaNog-Web-orm.xml</mapping-file>
         <properties>
             <property name="hibernate.dialect" value="org.hibernate.dialect.MySQL5Dialect"/>
             <property name="hibernate.hbm2ddl.auto" value="update"/>
