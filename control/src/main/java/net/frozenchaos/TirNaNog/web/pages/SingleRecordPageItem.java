@@ -1,14 +1,14 @@
-package net.frozenchaos.TirNaNog.web.views;
+package net.frozenchaos.TirNaNog.web.pages;
 
-public class SingleRecordViewItem extends ViewItem {
+public class SingleRecordPageItem extends PageItem {
     private String recordName;
     private String valuesToDisplay;
 
-    public SingleRecordViewItem() {
+    public SingleRecordPageItem() {
         super();
     }
 
-    public SingleRecordViewItem(long id, int width, String recordName, String valuesToDisplay) {
+    public SingleRecordPageItem(long id, int width, String recordName, String valuesToDisplay) {
         super(id, width);
         this.recordName = recordName;
         this.valuesToDisplay = valuesToDisplay;

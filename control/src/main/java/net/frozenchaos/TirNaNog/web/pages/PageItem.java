@@ -1,13 +1,13 @@
-package net.frozenchaos.TirNaNog.web.views;
+package net.frozenchaos.TirNaNog.web.pages;
 
-public abstract class ViewItem {
+public abstract class PageItem {
     private long id;
     private int width;
 
-    public ViewItem() {
+    public PageItem() {
     }
 
-    protected ViewItem(long id, int width) {
+    protected PageItem(long id, int width) {
         this.id = id;
         this.width = width;
     }

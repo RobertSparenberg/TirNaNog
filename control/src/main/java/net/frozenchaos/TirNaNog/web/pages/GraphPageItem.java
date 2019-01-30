@@ -1,16 +1,16 @@
-package net.frozenchaos.TirNaNog.web.views;
+package net.frozenchaos.TirNaNog.web.pages;
 
-public class GraphViewItem extends ViewItem {
+public class GraphPageItem extends PageItem {
     private String recordName;
     private String recordValue;
     private int updateDelay;
     private int numberOfValuesToUse;
 
-    public GraphViewItem() {
+    public GraphPageItem() {
         super();
     }
 
-    public GraphViewItem(long id, int width, String recordName, String recordValue, int updateDelay, int numberOfValuesToUse) {
+    public GraphPageItem(long id, int width, String recordName, String recordValue, int updateDelay, int numberOfValuesToUse) {
         super(id, width);
         this.recordName = recordName;
         this.recordValue = recordValue;

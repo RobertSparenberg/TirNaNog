@@ -8,7 +8,109 @@
 
     <!-- Abstract entities -->
 
+    <entity class="net.frozenchaos.TirNaNog.web.pages.PageItem" name="PageItem">
+        <table name="pages_items"/>
+        <attributes>
+            <id name="id">
+                <column name="id" unique="true" nullable="false"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <basic name="width">
+                <column name="width" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
 
 
-    <!-- TirNaNog-Control mappings -->
+
+    <!-- Page related mappings -->
+
+    <entity class="net.frozenchaos.TirNaNog.web.pages.Page" name="Page">
+        <table name="pages_pages"/>
+        <attributes>
+            <id name="name">
+                <column name="name" unique="true" nullable="false" length="64"/>
+            </id>
+            <one-to-many name="pages_rows" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.web.pages.PageRow">
+                <order-column name="order" nullable="false"/>
+                <join-column name="owning_page" referenced-column-name="name" nullable="false"/>
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.web.pages.PageRow" name="PageRow">
+        <table name="pages_rows"/>
+        <attributes>
+            <id name="id">
+                <column name="id" unique="true" nullable="false"/>
+                <generated-value strategy="IDENTITY"/>
+            </id>
+            <one-to-many name="pages_items" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.web.pages.PageItem">
+                <order-column name="order" nullable="false"/>
+                <join-column name="owning_row" referenced-column-name="id" nullable="false"/>
+                <cascade><cascade-all/></cascade>
+            </one-to-many>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.web.pages.GraphPageItem" name="GraphPageItem">
+        <table name="pages_items"/>
+        <discriminator-value>GraphPageItem</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
+        <attributes>
+            <!--<id name="graphId">-->
+                <!--<column name="id" unique="true" nullable="false"/>-->
+                <!--<generated-value strategy="IDENTITY"/>-->
+            <!--</id>-->
+            <basic name="recordName">
+                <column name="record_name" nullable="false"/>
+            </basic>
+            <basic name="recordValue">
+                <column name="record_value" nullable="false"/>
+            </basic>
+            <basic name="updateDelay">
+                <column name="update_delay" nullable="false"/>
+            </basic>
+            <basic name="numberOfValuesToUse">
+                <column name="number_of_values_to_use" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.web.pages.ParameterPageItem" name="ParameterPageItem">
+        <table name="pages_items"/>
+        <discriminator-value>ParameterPageItem</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
+        <attributes>
+            <!--<id name="parameterId">-->
+                <!--<column name="id" unique="true" nullable="false"/>-->
+                <!--<generated-value strategy="IDENTITY"/>-->
+            <!--</id>-->
+            <basic name="parameterPath">
+                <column name="parameter_path" nullable="false"/>
+            </basic>
+            <basic name="updateDelay">
+                <column name="update_delay" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
+
+    <entity class="net.frozenchaos.TirNaNog.web.pages.SingleRecordPageItem" name="SingleRecordPageItem">
+        <table name="pages_items"/>
+        <discriminator-value>SingleRecordPageItem</discriminator-value>
+        <discriminator-column name="type" discriminator-type="STRING"/>
+        <attributes>
+            <!--<id name="singleRecordId">-->
+                <!--<column name="id" unique="true" nullable="false"/>-->
+                <!--<generated-value strategy="IDENTITY"/>-->
+            <!--</id>-->
+            <basic name="recordName">
+                <column name="record_name" nullable="false"/>
+            </basic>
+            <basic name="valuesToDisplay">
+                <column name="values_to_display" nullable="false"/>
+            </basic>
+        </attributes>
+    </entity>
 </entity-mappings>

@@ -1,19 +1,19 @@
-package net.frozenchaos.TirNaNog.web.views;
+package net.frozenchaos.TirNaNog.web.pages;
 
-public class ParameterViewItem extends ViewItem {
+public class ParameterPageItem extends PageItem {
     private String parameterPath;
     private int updateDelay = -1;
 
-    public ParameterViewItem() {
+    public ParameterPageItem() {
         super();
     }
 
-    public ParameterViewItem(long id, int width, String parameterPath) {
+    public ParameterPageItem(long id, int width, String parameterPath) {
         super(id, width);
         this.parameterPath = parameterPath;
     }
 
-    public ParameterViewItem(long id, int width, String parameterPath, int updateDelay) {
+    public ParameterPageItem(long id, int width, String parameterPath, int updateDelay) {
         super(id, width);
         this.parameterPath = parameterPath;
         this.updateDelay = updateDelay;

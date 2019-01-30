@@ -1,40 +1,25 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <title th:text="TirNaNog - ${moduleName} Configuration"/>
+    <title th:text="TirNaNog - ${moduleName}"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <!-- embed jquery -->
-    <!-- embed admin jquery -->
+    <script src="includes/jquery-3.3.1.min.js"/>
+    <script src="includes/chart.min.js"/>
+    <script src="includes/tirnanog.js"/>
 </head>
 <body>
     <div id="header">
-        <h1 th:text="TirNaNog - ${moduleName} Configuration"/>
+        <h1 th:text="TirNaNog - ${moduleName}"/>
     </div>
     <div id="navigation">
         <ul class="navigation-list">
-            <li th:each="link : ${link}">
-                <a th:href="${page.link}"><span th:text="${page.text}"/></a>
-            </li>
+            <li>Button 1</li>
+            <li>Button 2</li>
+            <li>Button 3</li>
+            <li>Button 4</li>
         </ul>
     </div>
     <div id="content">
     </div>
-
-
-    <!--<table>-->
-        <!--<tr th:each="setting : ${settings}">-->
-            <!--<td th:text="${setting.name + ' - ' + setting.value}"/>-->
-        <!--</tr>-->
-
-        <!--<form th:action="@{/configuration}">-->
-            <!--<input type="select">-->
-                <!--<option th:each="setting : ${settings}" th:id="${setting.name}">-->
-                    <!--<span th:text="${setting.name}"/>-->
-                <!--</option>-->
-            <!--</input>-->
-            <!--<input type="text"/>-->
-            <!--<input type="submit"/>-->
-        <!--</form>-->
-    <!--</table>-->
 </body>
 </html>
