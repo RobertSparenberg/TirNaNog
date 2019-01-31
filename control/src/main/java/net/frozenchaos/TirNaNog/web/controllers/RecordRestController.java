@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping(value = "rest/records/")
+@RequestMapping(value = "/rest/records")
 public class RecordRestController {
     private final RecordRepository recordRepository;
 
@@ -20,7 +20,7 @@ public class RecordRestController {
         this.recordRepository = recordRepository;
     }
 
-    @RequestMapping(value = "all", method = RequestMethod.GET)
+    @RequestMapping(value = "/all", method = RequestMethod.GET)
     public List<Record> getAllRecords(@RequestParam String recordName) {
         return recordRepository.findByName(recordName);
     }

@@ -1,5 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
+import net.frozenchaos.TirNaNog.TirNaNogProperties;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.slf4j.Logger;
@@ -30,7 +31,7 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
 
 
     @Autowired
-    public Explorer(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, Timer timer, Properties properties) {
+    public Explorer(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, Timer timer, TirNaNogProperties properties) {
         this.moduleConfigRepository = moduleConfigRepository;
         this.ownConfigService = ownConfigService;
         this.timer = timer;

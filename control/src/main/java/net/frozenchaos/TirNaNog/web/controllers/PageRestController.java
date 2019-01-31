@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @RestController
+@RequestMapping("/rest")
 public class PageRestController {
     private final OwnConfigService ownConfigService;
     private final ModuleConfigRepository moduleConfigRepository;
@@ -32,21 +33,23 @@ public class PageRestController {
         this.pageRepository = pageRepository;
     }
 
-    @RequestMapping("/links")
+    @RequestMapping("/pages/links")
     public List<String> getPages() {
         List<String> pages = new ArrayList<>();
+        pages.add("test1");
+        pages.add("test2");
         for(Page page : pageRepository.findAll()) {
             pages.add(page.getName());
         }
         return pages;
     }
 
-    @RequestMapping("/pages/{pageName}")
+    @RequestMapping("/pages/page/{pageName}")
     public Page getPage(@PathVariable String pageName) {
         return pageRepository.findByName(pageName);
     }
 
-    @RequestMapping("/admin/links")
+    @RequestMapping("/admin/pages/links")
     public List<String> getAdminPages() {
         List<String> pages = new ArrayList<>();
         pages.add(ownConfigService.getOwnConfig().getName());
@@ -56,7 +59,7 @@ public class PageRestController {
         return pages;
     }
 
-    @RequestMapping("/admin/pages/{pageName}")
+    @RequestMapping("/admin/pages/page/{pageName}")
     public ModuleConfig getAdminPage(@PathVariable String pageName) {
         ModuleConfig ownConfig = ownConfigService.getOwnConfig();
         if(pageName.equals(ownConfig.getName())) {
@@ -65,7 +68,7 @@ public class PageRestController {
         return moduleConfigRepository.findByName(pageName);
     }
 
-    @RequestMapping("admin/automation")
+    @RequestMapping("/admin/automation")
     public Iterable<Function> getFunctions() {
         return functionRepository.findAll();
     }

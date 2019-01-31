@@ -12,18 +12,22 @@ import org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter;
 import javax.sql.DataSource;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Properties;
 
 @Configuration
 public class AppConfig {
     private static final java.lang.String DB_USERNAME = "net.frozenchaos.TirNaNog.db.username";
     private static final java.lang.String DB_PASSWORD = "net.frozenchaos.TirNaNog.db.password";
     private static final java.lang.String DB_PORT = "net.frozenchaos.TirNaNog.db.port";
-    private final Properties properties;
+    private final TirNaNogProperties properties;
 
     public AppConfig() throws IOException {
-        this.properties = new Properties();
+        this.properties = new TirNaNogProperties();
         properties.load(new FileInputStream("application.properties"));
+    }
+
+    @Bean
+    public TirNaNogProperties tirNaNogProperties() {
+        return properties;
     }
 
     @Bean

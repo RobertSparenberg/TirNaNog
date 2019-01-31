@@ -48,7 +48,6 @@ public class Timer implements Runnable {
 
             ScheduledTask task = getNextTask();
             if(task == null) {
-                logger.trace("Timer found no tasks, sleeping for up to a minute");
                 try {
                     Thread.sleep(60000);
                 } catch(Exception ignored) {

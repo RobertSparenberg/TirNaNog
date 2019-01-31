@@ -1,5 +1,6 @@
 package net.frozenchaos.TirNaNog.explorer;
 
+import net.frozenchaos.TirNaNog.TirNaNogProperties;
 import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
 import net.frozenchaos.TirNaNog.capabilities.OwnCapabilityApplicationsService;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
@@ -7,7 +8,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
-import java.util.Properties;
 
 @Service
 public class OwnConfigService {
@@ -17,7 +17,7 @@ public class OwnConfigService {
     private final ModuleConfig ownConfig;
 
     @Autowired
-    public OwnConfigService(Properties properties, OwnCapabilityApplicationsService capabilityApplicationsService) {
+    public OwnConfigService(TirNaNogProperties properties, OwnCapabilityApplicationsService capabilityApplicationsService) {
         this.capabilityApplicationsService = capabilityApplicationsService;
 
         String name = properties.getProperty(MODULE_NAME_PROPERTY, "Unknown");
