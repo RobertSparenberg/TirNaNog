@@ -6,9 +6,10 @@
     <script th:src="@{jquery-3.3.1.min.js}"/>
     <script th:src="@{jquery-ui.min.js}"/>
     <script th:src="@{chart.min.js}"/>
-    <script th:src="@{TirNaNog-ViewNavigation.js}"/>
-    <link rel="stylesheet" th:href="@{jquery-ui.min.css}">
-    <link rel="stylesheet" th:href="@{TirNaNog.css}">
+    <script th:src="@{TirNaNog-AdminNavigation.js}"/>
+    <link rel="stylesheet" th:href="@{jquery-ui.min.css}"/>
+    <link rel="stylesheet" th:href="@{TirNaNog.css}"/>
+    <link rel="stylesheet" th:href="@{TirNaNog-Admin.css}"/>
 </head>
 <body>
     <div id="header">
@@ -16,7 +17,10 @@
     </div>
     <div id="navigation">
         <ul>
-            <li><a href="/admin">Admin</a></li>
+            <li><a href="/">Back</a></li>
+            <li><a href="/admin/pages/page/views">Views</a></li>
+            <li><a href="/admin/pages/page/functions">Automation</a></li>
+            <li><a href="/admin/pages/page/modules">Other Modules</a></li>
         </ul>
     </div>
     <div id="content">

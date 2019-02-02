@@ -7,8 +7,8 @@
     <script th:src="@{jquery-ui.min.js}"/>
     <script th:src="@{chart.min.js}"/>
     <script th:src="@{TirNaNog-ViewNavigation.js}"/>
-    <link rel="stylesheet" th:href="@{jquery-ui.min.css}">
-    <link rel="stylesheet" th:href="@{TirNaNog.css}">
+    <link rel="stylesheet" th:href="@{jquery-ui.min.css}"/>
+    <link rel="stylesheet" th:href="@{TirNaNog.css}"/>
 </head>
 <body>
     <div id="header">
@@ -20,7 +20,10 @@
         </ul>
     </div>
     <div id="content">
-        Loading...
+        <div th:each="row : ${rows}" class="content-row">
+            <div th:each="item : ${pageItems}" th:class="${item.getClass().getSimpleName()}" th:include="items :: ${item.getClass().getSimpleName()}">
+            </div>
+        </div>
     </div>
 </body>
 </html>

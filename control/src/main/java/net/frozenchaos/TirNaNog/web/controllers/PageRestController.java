@@ -2,13 +2,11 @@ package net.frozenchaos.TirNaNog.web.controllers;
 
 import net.frozenchaos.TirNaNog.automation.Function;
 import net.frozenchaos.TirNaNog.data.FunctionRepository;
-import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.explorer.OwnConfigService;
 import net.frozenchaos.TirNaNog.web.pages.Page;
 import net.frozenchaos.TirNaNog.web.pages.PageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -42,30 +40,6 @@ public class PageRestController {
             pages.add(page.getName());
         }
         return pages;
-    }
-
-    @RequestMapping("/pages/page/{pageName}")
-    public Page getPage(@PathVariable String pageName) {
-        return pageRepository.findByName(pageName);
-    }
-
-    @RequestMapping("/admin/pages/links")
-    public List<String> getAdminPages() {
-        List<String> pages = new ArrayList<>();
-        pages.add(ownConfigService.getOwnConfig().getName());
-        for(ModuleConfig module : moduleConfigRepository.findAll()) {
-            pages.add(module.getName());
-        }
-        return pages;
-    }
-
-    @RequestMapping("/admin/pages/page/{pageName}")
-    public ModuleConfig getAdminPage(@PathVariable String pageName) {
-        ModuleConfig ownConfig = ownConfigService.getOwnConfig();
-        if(pageName.equals(ownConfig.getName())) {
-            return ownConfig;
-        }
-        return moduleConfigRepository.findByName(pageName);
     }
 
     @RequestMapping("/admin/automation")

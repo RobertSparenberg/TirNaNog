@@ -1,0 +1,38 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<head>
+    <title th:text="${'TirNaNog - ' + moduleName}"/>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+    <script th:src="@{jquery-3.3.1.min.js}"/>
+    <script th:src="@{jquery-ui.min.js}"/>
+    <script th:src="@{chart.min.js}"/>
+    <script th:src="@{TirNaNog-AdminNavigation.js}"/>
+    <link rel="stylesheet" th:href="@{jquery-ui.min.css}"/>
+    <link rel="stylesheet" th:href="@{TirNaNog.css}"/>
+</head>
+<body>
+    <div id="header">
+        <h1 th:text="${'TirNaNog - ' + moduleName}"/>
+    </div>
+    <div id="navigation">
+        <ul>
+            <li><a href="/">Back</a></li>
+            <li><a href="/admin/pages/page/views">Views</a></li>
+            <li><a href="/admin/pages/page/functions">Automation</a></li>
+            <li><a href="/admin/pages/page/modules">Other Modules</a></li>
+        </ul>
+    </div>
+    <div id="content">
+        <div id="views-navigation">
+            <ul class="newView">
+                <li><a href="#" onclick="newView()">New View</a></li>
+            </ul>
+            <ul id="views">
+            </ul>
+        </div>
+        <div id="views-content">
+            Loading...
+        </div>
+    </div>
+</body>
+</html>

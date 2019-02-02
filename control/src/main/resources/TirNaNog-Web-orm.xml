@@ -32,7 +32,7 @@
                 <column name="name" unique="true" nullable="false" length="64"/>
             </id>
             <one-to-many name="pages_rows" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.web.pages.PageRow">
-                <order-column name="order" nullable="false"/>
+                <order-column name="row_order" nullable="false"/>
                 <join-column name="owning_page" referenced-column-name="name" nullable="false"/>
                 <cascade><cascade-all/></cascade>
             </one-to-many>
@@ -47,7 +47,7 @@
                 <generated-value strategy="IDENTITY"/>
             </id>
             <one-to-many name="pages_items" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.web.pages.PageItem">
-                <order-column name="order" nullable="false"/>
+                <order-column name="item_order" nullable="false"/>
                 <join-column name="owning_row" referenced-column-name="id" nullable="false"/>
                 <cascade><cascade-all/></cascade>
             </one-to-many>

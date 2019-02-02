@@ -4,8 +4,11 @@
     <title th:text="${'TirNaNog - ' + moduleName}"/>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
     <script th:src="@{jquery-3.3.1.min.js}"/>
+    <script th:src="@{jquery-ui.min.js}"/>
     <script th:src="@{chart.min.js}"/>
-    <script th:src="@{TirNaNog.js}"/>
+    <script th:src="@{TirNaNog-ViewNavigation.js}"/>
+    <link rel="stylesheet" th:href="@{jquery-ui.min.css}">
+    <link rel="stylesheet" th:href="@{TirNaNog.css}">
 </head>
 <body>
     <div id="header">
@@ -17,7 +20,19 @@
         </ul>
     </div>
     <div id="content">
-        Loading...
+
+        <div th:fragment="GraphPageItem">
+
+        </div>
+
+        <div th:fragment="ParameterPageItem">
+
+        </div>
+
+        <div th:fragment="SingleRecordPageItem">
+
+        </div>
+
     </div>
 </body>
 </html>
