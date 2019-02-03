@@ -25,19 +25,10 @@
         </ul>
     </div>
     <div id="content">
-        <div id="view-delete-dialog"><p>Are you sure you wish to delete <b>{ViewName}</b>?</p></div>
+        <div id="rename-view-dialog"><p>Please enter a new name below:</p><input id="new-name-input" type="text" th:value="${view.name}"/></div>
 
-        <div id="views-navigation">
-            <ul class="newView">
-                <li><a href="#" onclick="newView()">New View</a></li>
-            </ul>
-            <ul id="views">
-            </ul>
-        </div>
+        <div id="view-name"><p th:text="${view.name}"/><a id="rename-view">Rename</a></div>
 
-        <div id="views-content">
-            <p class="loading">There are currently no views. Consider creating a new one.</p>
-        </div>
     </div>
 </body>
 </html>

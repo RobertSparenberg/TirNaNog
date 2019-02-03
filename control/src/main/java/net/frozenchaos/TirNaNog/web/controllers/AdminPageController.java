@@ -37,4 +37,11 @@ public class AdminPageController {
         model.put("moduleName", moduleName);
         return "admin/" + pageName;
     }
+
+    @RequestMapping("pages/page/views/view/{pageName}")
+    public String getView(ModelMap model, @PathVariable String pageName) {
+        model.put("moduleName", moduleName);
+        model.put("view", pageRepository.findByName(pageName.replace('_', ' ')));
+        return "admin/view";
+    }
 }

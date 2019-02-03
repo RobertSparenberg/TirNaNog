@@ -7,10 +7,8 @@ import net.frozenchaos.TirNaNog.explorer.OwnConfigService;
 import net.frozenchaos.TirNaNog.web.pages.Page;
 import net.frozenchaos.TirNaNog.web.pages.PageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,15 +29,6 @@ public class AdminPageRestController {
         this.moduleConfigRepository = moduleConfigRepository;
         this.functionRepository = functionRepository;
         this.pageRepository = pageRepository;
-    }
-
-    @RequestMapping("/pages/save")
-    public List<String> getPages() {
-        List<String> pages = new ArrayList<>();
-        for(Page page : pageRepository.findAll()) {
-            pages.add(page.getName());
-        }
-        return pages;
     }
 
     @RequestMapping("/automation")
@@ -71,5 +60,20 @@ public class AdminPageRestController {
             }
         }
         pageRepository.save(newPageList);
+    }
+
+    @RequestMapping(value = "/pages/page/views/view/{originalPageName}/save", method = RequestMethod.POST)
+    public void savePage(@PathVariable String originalPageName, @RequestBody Page page) {
+        originalPageName = originalPageName.replace('_', ' ');
+        Page originalPage = pageRepository.findByName(originalPageName);
+        if(originalPage != null) {
+            if(!originalPageName.equals(page.getName()) && !StringUtils.isEmpty(page.getName())) {
+                if(pageRepository.findByName(page.getName()) == null) {
+                    originalPage.setName(page.getName());
+                }
+            }
+            originalPage.setRows(page.getRows());
+            pageRepository.save(originalPage);
+        }
     }
 }
