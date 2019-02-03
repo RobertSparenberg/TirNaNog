@@ -6,9 +6,10 @@
     <script th:src="@{jquery-3.3.1.min.js}"/>
     <script th:src="@{jquery-ui.min.js}"/>
     <script th:src="@{chart.min.js}"/>
-    <script th:src="@{TirNaNog-AdminNavigation.js}"/>
+    <script th:src="@{/admin/TirNaNog-Admin.js}"/>
     <link rel="stylesheet" th:href="@{jquery-ui.min.css}"/>
     <link rel="stylesheet" th:href="@{TirNaNog.css}"/>
+    <link rel="stylesheet" th:href="@{/admin/TirNaNog.css}"/>
 </head>
 <body>
     <div id="header">
@@ -23,6 +24,8 @@
         </ul>
     </div>
     <div id="content">
+        <div id="viewDeleteDialog"><p>Are you sure you wish to delete <b>{ViewName}</b>?</p></div>
+
         <div id="views-navigation">
             <ul class="newView">
                 <li><a href="#" onclick="newView()">New View</a></li>
@@ -30,8 +33,9 @@
             <ul id="views">
             </ul>
         </div>
+
         <div id="views-content">
-            Loading...
+            <p class="loading">There are currently no views. Consider creating a new one.</p>
         </div>
     </div>
 </body>

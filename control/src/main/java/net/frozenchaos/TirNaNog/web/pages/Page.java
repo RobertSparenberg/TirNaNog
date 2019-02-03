@@ -1,12 +1,16 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class Page {
     private String name;
-    private List<PageRow> rows = new ArrayList<>();
+    private int order;
+    private PageRow rows[];
+
+    public Page() {
+    }
+
+    public Page(String name) {
+        this.name = name;
+    }
 
     public String getName() {
         return name;
@@ -16,11 +20,19 @@ public class Page {
         this.name = name;
     }
 
+    public int getOrder() {
+        return order;
+    }
+
+    public void setOrder(int order) {
+        this.order = order;
+    }
+
     public PageRow[] getRows() {
-        return (PageRow[]) rows.toArray();
+        return rows;
     }
 
     public void setRows(PageRow rows[]) {
-        Collections.addAll(this.rows, rows);
+        this.rows = rows;
     }
 }

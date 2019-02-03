@@ -1,6 +1,5 @@
 package net.frozenchaos.TirNaNog.web.controllers;
 
-import net.frozenchaos.TirNaNog.automation.Function;
 import net.frozenchaos.TirNaNog.data.FunctionRepository;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.explorer.OwnConfigService;
@@ -34,16 +33,9 @@ public class PageRestController {
     @RequestMapping("/pages/links")
     public List<String> getPages() {
         List<String> pages = new ArrayList<>();
-        pages.add("test1");
-        pages.add("test2");
-        for(Page page : pageRepository.findAll()) {
+        for(Page page : pageRepository.getPagesOrdered()) {
             pages.add(page.getName());
         }
         return pages;
-    }
-
-    @RequestMapping("/admin/automation")
-    public Iterable<Function> getFunctions() {
-        return functionRepository.findAll();
     }
 }

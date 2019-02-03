@@ -31,6 +31,9 @@
             <id name="name">
                 <column name="name" unique="true" nullable="false" length="64"/>
             </id>
+            <basic name="order">
+                <column name="page_order" nullable="false"/>
+            </basic>
             <one-to-many name="pages_rows" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.web.pages.PageRow">
                 <order-column name="row_order" nullable="false"/>
                 <join-column name="owning_page" referenced-column-name="name" nullable="false"/>

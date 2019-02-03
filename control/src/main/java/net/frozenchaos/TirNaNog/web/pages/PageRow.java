@@ -1,12 +1,8 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 public class PageRow {
     private long id;
-    List<PageItem> pageItems = new ArrayList<>();
+    PageItem pageItems[];
 
     public long getId() {
         return id;
@@ -17,10 +13,10 @@ public class PageRow {
     }
 
     public PageItem[] getPageItems() {
-        return (PageItem[]) pageItems.toArray();
+        return pageItems;
     }
 
     public void setPageItems(PageItem pageItems[]) {
-        Collections.addAll(this.pageItems, pageItems);
+        this.pageItems = pageItems;
     }
 }
