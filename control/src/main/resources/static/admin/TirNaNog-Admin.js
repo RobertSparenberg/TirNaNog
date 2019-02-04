@@ -2,12 +2,41 @@
 // VIEWS PAGE //
 ////////////////
 
+var subPages;
+var currentSubPage;
+
 //view related editing
 
 function saveView() {
+    var rowsFromDom = $("#view-rows > div");
+    var rows = [];
+    for(rowFromDom : rowsFromDom) {
+        var pageItems = [];
+        for(pageItemFromDom : rowFromDom.children()) {
+            var pageItem = {type: pageItemFromDom.attr("class")}
+            switch(pageItem.type) {
+                case "GraphPageItem":
+                    pageItem.recordName = pageItemFromDom.children('input[name="recordName"]').val();
+                    pageItem.recordValue = pageItemFromDom.children('input[name="recordValue"]').val();
+                    pageItem.updateDelay = pageItemFromDom.children('input[name="updateDelay"]').val();
+                    pageItem.numberOfValuesToUse = pageItemFromDom.children('input[name="numberOfValuesToUse"]').val();
+                    break;
+                case "ParameterPageItem":
+                    pageItem.parameterPath = pageItemFromDom.children('input[name="parameterPath"]').val();
+                    break;
+                case "SingleRecordPageItem":
+                    pageItem.recordName = pageItemFromDom.children('input[name="recordName"]').val();
+                    pageItem.valuesToDisplay = pageItemFromDom.children('input[name="valuesToDisplay"]').val();
+                    break;
+            }
+            pageItems.push(pageItem);
+        }
+        rows.push({"pageItems": pageItems});
+    }
+
     var viewObject = {"name": $("#view-name p:first").text(),
                       "order": -1,
-                      "rows": []
+                      "rows": rows
     };
     $.ajax({type: "POST",
             headers: {
@@ -51,13 +80,50 @@ function renameView() {
     $("#view-delete-dialog").dialog("open");
 }
 
+function selectViewRow() {
+    for(oldSelectedRow : $("#view-rows .selected")) {
+        oldSelectedRow.removeClass("selected");
+    }
+    $(this).addClass("selected");
+}
+
+function addViewRow() {
+    $("#view-rows").append("<div></div>");
+    $("#view-rows > div:last").click(selectViewRow);
+}
+
+function addViewItem() {
+    var type = $(this).selectedIndex;
+    var viewItem;
+    switch(type) {
+        case "GraphPageItem":
+            var recordNameInput = "<div class=\"viewItemInput\"><p class=\"label\">Record Name</p><input name=\"recordName\" type=\"text\"/></div>";
+            var recordValueInput = "<div class=\"viewItemInput\"><p class=\"label\">Record Value</p><input name=\"recordValue\" type=\"text\"/></div>";
+            var updateDelayInput = "<div class=\"viewItemInput\"><p class=\"label\">Update Delay</p><input name=\"updateDelay\" type=\"text\"/></div>";
+            var numberOfValuesInput = "<div class=\"viewItemInput\"><p class=\"label\">Number of values to use</p><input name=\"numberOfValuesToUse\" type=\"text\"/></div>";
+            viewItem = recordNameInput + recordValueInput + updateDelayInput + numberOfValuesInput;
+            break;
+        case "ParameterPageItem":
+            viewItem = "<div class=\"viewItemInput\"><p class=\"label\">Parameter Path</p><input name=\"parameterPath\" type=\"text\"/></div>";
+            break;
+        case "SingleRecordPageItem":
+            var recordNameInput = "<div class=\"viewItemInput\"><p class=\"label\">Record Name</p><input name=\"recordName\" type=\"text\"/></div>";
+            var valuesToDisplayInput = "<div class=\"viewItemInput\"><p class=\"label\">Record Values</p><input name=\"valuesToDisplay\" type=\"text\"/></div>";
+            viewItem = recordNameInput + valuesToDisplayInput;
+            break;
+    }
+    viewItem = "<div class=\"viewItem\"><h1>" + $(this).val() + "</h1>" + viewItem + "</div>";
+    $("#view-rows .selected").append(viewItem);
+    $("#add-view-item").prop("selectedIndex", "");
+}
+
 
 
 //view related navigation
 
 function showView(e) {
     var link = e.target.href;
-    $("#views-content").load(link + " #content", function(responseText, statusText, response) {
+    $("#views-content").load(link + " #content > *", function(responseText, statusText, response) {
         if(response.status == 200) {
             $("#rename-view-dialog").dialog({
                     modal: true,
@@ -67,7 +133,15 @@ function showView(e) {
                     title: "Rename View"
             });
             $("#rename-view").click(renameView);
-            //$("#views").sortable({stop:saveViewOrder});
+
+            var splitLink = link.split("/");
+            var viewName = splitLink[splitLink.length-1];
+            for(view : views) {
+                if(view.name === viewName) {
+                    currentSubPage = view;
+                    break;
+                }
+            }
         } else {
             alert("Failed to load '" + link + "'");
         }
@@ -146,7 +220,7 @@ function initViewsPage() {
             width: 500,
             height: 200,
             autoOpen: false,
-            title: "Confirm Delete"
+            title: "Delete"
     });
     $("#views").sortable({stop:saveViewOrder});
 
@@ -154,7 +228,24 @@ function initViewsPage() {
         for(var i = 0; i < result.length; i++) {
             newView(result[i]);
         }
+        subPages = result;
+        $("#views a.view:first").click();
     }});
+}
+
+function initViewPage() {
+    $("#view-rename-dialog").dialog({
+            modal: true,
+            width: 500,
+            height: 200,
+            autoOpen: false,
+            title: "Rename"
+    });
+    $("#view-rows").sortable({stop:saveViewRowOrder});
+
+    for(row : currentSubPage.rows) {
+        addViewRow();
+    }
 }
 
 
@@ -173,9 +264,15 @@ function navigateToPage(e) {
 }
 
 function loadPage(link) {
-    $("#content").load(link + " #content", function(responseText, statusText, response) {
+    $("#content").load(link + " #content > *", function(responseText, statusText, response) {
         if(response.status == 200) {
-            initViewsPage();
+            var splitLink = link.split("/");
+            var pageName = splitLink[splitLink.length-1];
+            switch(pageName) {
+                case "views":
+                    initViewsPage();
+                    break;
+            }
         } else {
             alert("Failed to load '" + link + "'");
         }

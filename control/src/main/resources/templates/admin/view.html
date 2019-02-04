@@ -25,9 +25,31 @@
         </ul>
     </div>
     <div id="content">
-        <div id="rename-view-dialog"><p>Please enter a new name below:</p><input id="new-name-input" type="text" th:value="${view.name}"/></div>
+        <div id="rename-view-dialog">
+            <div id="rename-view-dialog-error" class="error"></div>
+            <div class="dialog-content">
+                <p>Please enter a new name:</p>
+                <input id="new-name-input" type="text" th:value="${view.name}"/>
+            </div>
+        </div>
 
         <div id="view-name"><p th:text="${view.name}"/><a id="rename-view">Rename</a></div>
+        <div id="view-toolbox">
+            <ul>
+                <li><a id="view-add-row" onclick="addViewRow()">Add Row</a></li>
+                <li>
+                    <select id="add-view-item" onchange="if(this.selectedIndex) addViewItem();">
+                        <option value="">Add Item to selected row</option>
+                        <option value="GraphPageItem" title="Displays a graph based on record values.">Graph</option>
+                        <option value="ParameterPageItem" title="A control for setting a parameter on the system.">Control</option>
+                        <option value="SingleRecordPageItem" title="Displays the current value of a record.">Record Monitor</option>
+                    </select>
+                </li>
+            </ul>
+        </div>
+
+        <div id="view-rows">
+        </div>
 
     </div>
 </body>
