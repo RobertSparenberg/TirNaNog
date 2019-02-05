@@ -1,3 +1,11 @@
 .ui-dialog-titlebar-close {
     visibility: hidden;
 }
+
+#view-rows div.viewRow {
+    min-height: 200px;
+    border: 1px solid;
+    margin: 5px;
+    padding: 5px;
+    background-color: #dddddd;
+}

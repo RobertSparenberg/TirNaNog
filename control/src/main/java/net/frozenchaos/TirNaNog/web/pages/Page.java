@@ -29,6 +29,9 @@ public class Page {
     }
 
     public PageRow[] getRows() {
+        if(rows == null) {
+            return new PageRow[0];
+        }
         return rows;
     }
 

@@ -13,6 +13,9 @@ public class PageRow {
     }
 
     public PageItem[] getPageItems() {
+        if(pageItems == null) {
+            return new PageItem[0];
+        }
         return pageItems;
     }
 

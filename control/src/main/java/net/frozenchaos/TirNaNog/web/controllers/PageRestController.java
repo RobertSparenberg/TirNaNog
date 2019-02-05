@@ -6,6 +6,7 @@ import net.frozenchaos.TirNaNog.explorer.OwnConfigService;
 import net.frozenchaos.TirNaNog.web.pages.Page;
 import net.frozenchaos.TirNaNog.web.pages.PageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -37,5 +38,10 @@ public class PageRestController {
             pages.add(page.getName());
         }
         return pages;
+    }
+
+    @RequestMapping("/pages/page/{pageName}")
+    public Page getPage(@PathVariable String pageName) {
+        return pageRepository.findByName(pageName.replace('_', ' '));
     }
 }

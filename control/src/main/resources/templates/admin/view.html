@@ -36,9 +36,9 @@
         <div id="view-name"><p th:text="${view.name}"/><a id="rename-view">Rename</a></div>
         <div id="view-toolbox">
             <ul>
-                <li><a id="view-add-row" onclick="addViewRow()">Add Row</a></li>
+                <li><a id="view-add-row" href="#">Add Row</a></li>
                 <li>
-                    <select id="add-view-item" onchange="if(this.selectedIndex) addViewItem();">
+                    <select id="add-view-item">
                         <option value="">Add Item to selected row</option>
                         <option value="GraphPageItem" title="Displays a graph based on record values.">Graph</option>
                         <option value="ParameterPageItem" title="A control for setting a parameter on the system.">Control</option>

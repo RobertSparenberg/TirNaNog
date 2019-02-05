@@ -10,9 +10,12 @@ var currentSubPage;
 function saveView() {
     var rowsFromDom = $("#view-rows > div");
     var rows = [];
-    for(rowFromDom : rowsFromDom) {
+    for(var i = 0; i < rowsFromDom.length; i++) {
+        var rowFromDom = rowsFromDom[i];
         var pageItems = [];
-        for(pageItemFromDom : rowFromDom.children()) {
+        var pageItemsFromDom = rowFromDom.children();
+        for(var j = 0; j < pageItemsFromDom.length; j++) {
+            var pageItemFromDom = pageItemsFromDom[j];
             var pageItem = {type: pageItemFromDom.attr("class")}
             switch(pageItem.type) {
                 case "GraphPageItem":
@@ -81,19 +84,21 @@ function renameView() {
 }
 
 function selectViewRow() {
-    for(oldSelectedRow : $("#view-rows .selected")) {
+    var selectedRows =  $("#view-rows .selected");
+    for(var i = 0; i < selectedRows.length; i++) {
+        var oldSelectedRow = selectedRows[i];
         oldSelectedRow.removeClass("selected");
     }
     $(this).addClass("selected");
 }
 
 function addViewRow() {
-    $("#view-rows").append("<div></div>");
+    $("#view-rows").append("<div class=\"viewRow\"></div>");
     $("#view-rows > div:last").click(selectViewRow);
 }
 
-function addViewItem() {
-    var type = $(this).selectedIndex;
+function addViewItem(e) {
+    var type = $("#add-view-item option:selected")
     var viewItem;
     switch(type) {
         case "GraphPageItem":
@@ -125,20 +130,15 @@ function showView(e) {
     var link = e.target.href;
     $("#views-content").load(link + " #content > *", function(responseText, statusText, response) {
         if(response.status == 200) {
-            $("#rename-view-dialog").dialog({
-                    modal: true,
-                    width: 500,
-                    height: 200,
-                    autoOpen: false,
-                    title: "Rename View"
-            });
-            $("#rename-view").click(renameView);
-
             var splitLink = link.split("/");
             var viewName = splitLink[splitLink.length-1];
-            for(view : views) {
-                if(view.name === viewName) {
-                    currentSubPage = view;
+            for(var i = 0; i < subPages.length; i++) {
+                var view = subPages[i].replace(/ /g, "_");
+                if(view === viewName) {
+                    $.ajax({url: "/rest/pages/page/" + view, success: function(result) {
+                            currentSubPage = result;
+                            initViewPage();
+                        }});
                     break;
                 }
             }
@@ -241,10 +241,18 @@ function initViewPage() {
             autoOpen: false,
             title: "Rename"
     });
-    $("#view-rows").sortable({stop:saveViewRowOrder});
+    $("#rename-view").click(renameView);
+    $("#view-add-row").click(addViewRow);
+    $("#add-view-item").change(addViewItem);
+    $("#view-rows").sortable({stop:saveView});
 
-    for(row : currentSubPage.rows) {
+    for(var i = 0; i < currentSubPage.rows.length; i++) {
+        var row = currentSubPage.rows[i];
         addViewRow();
+        for(var j = 0; j < row.items.length; j++) {
+            var item = row.items[j];
+//            addViewItem(item);
+        }
     }
 }
 
