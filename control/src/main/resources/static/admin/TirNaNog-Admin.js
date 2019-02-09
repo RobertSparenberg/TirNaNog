@@ -13,7 +13,7 @@ function saveView() {
     for(var i = 0; i < rowsFromDom.length; i++) {
         var rowFromDom = rowsFromDom[i];
         var pageItems = [];
-        var pageItemsFromDom = rowFromDom.children();
+        var pageItemsFromDom = rowFromDom.children;
         for(var j = 0; j < pageItemsFromDom.length; j++) {
             var pageItemFromDom = pageItemsFromDom[j];
             var pageItem = {type: pageItemFromDom.attr("class")}
@@ -51,9 +51,9 @@ function saveView() {
             dataType: "json"});
 }
 
-function renameView() {
+function renameView(e) {
     e.preventDefault();
-    var oldName = $("#new-name-input").value();
+    var oldName = $("#new-name-input").val();
     $("#rename-view-dialog").dialog("option", "buttons", [
         {
             text: "Cancel",
@@ -80,32 +80,41 @@ function renameView() {
             }
         }
     ]);
-    $("#view-delete-dialog").dialog("open");
+    $("#rename-view-dialog").dialog("open");
 }
 
 function selectViewRow() {
-    var selectedRows =  $("#view-rows .selected");
-    for(var i = 0; i < selectedRows.length; i++) {
-        var oldSelectedRow = selectedRows[i];
-        oldSelectedRow.removeClass("selected");
-    }
+    $("#view-rows .selected").removeClass("selected");
     $(this).addClass("selected");
+}
+
+function deleteViewElement(e) {
+    e.target.parentElement.remove();
+    saveView();
 }
 
 function addViewRow() {
     $("#view-rows").append("<div class=\"viewRow\"></div>");
+    if($("#view-rows > div").length == 1) {
+        $("#view-rows > div").addClass("selected");
+    }
     $("#view-rows > div:last").click(selectViewRow);
+    $("#view-rows > div:last").sortable({stop:saveView});
 }
 
-function addViewItem(e) {
-    var type = $("#add-view-item option:selected")
+function addViewRowAndSave() {
+    addViewRow();
+    saveView();
+}
+
+function addViewItem(type) {
     var viewItem;
     switch(type) {
         case "GraphPageItem":
             var recordNameInput = "<div class=\"viewItemInput\"><p class=\"label\">Record Name</p><input name=\"recordName\" type=\"text\"/></div>";
             var recordValueInput = "<div class=\"viewItemInput\"><p class=\"label\">Record Value</p><input name=\"recordValue\" type=\"text\"/></div>";
             var updateDelayInput = "<div class=\"viewItemInput\"><p class=\"label\">Update Delay</p><input name=\"updateDelay\" type=\"text\"/></div>";
-            var numberOfValuesInput = "<div class=\"viewItemInput\"><p class=\"label\">Number of values to use</p><input name=\"numberOfValuesToUse\" type=\"text\"/></div>";
+            var numberOfValuesInput = "<div class=\"viewItemInput\"><p class=\"label\">Max datapoints</p><input name=\"numberOfValuesToUse\" type=\"text\"/></div>";
             viewItem = recordNameInput + recordValueInput + updateDelayInput + numberOfValuesInput;
             break;
         case "ParameterPageItem":
@@ -117,9 +126,16 @@ function addViewItem(e) {
             viewItem = recordNameInput + valuesToDisplayInput;
             break;
     }
-    viewItem = "<div class=\"viewItem\"><h1>" + $(this).val() + "</h1>" + viewItem + "</div>";
-    $("#view-rows .selected").append(viewItem);
+    viewItem = "<div class=\"viewItem\"><h1>" + $("#add-view-item > option[value='" + type + "']").text() + "</h1>" + viewItem + "</div>";
+    $("#view-rows > div.selected").append(viewItem);
     $("#add-view-item").prop("selectedIndex", "");
+    $("#view-rows > div.selected > div.viewItemInput:last > input").change(saveView);
+}
+
+function addViewItemAndSave(e) {
+    var type = $("#add-view-item option:selected").val();
+    addViewItem(type);
+    saveView();
 }
 
 
@@ -234,7 +250,7 @@ function initViewsPage() {
 }
 
 function initViewPage() {
-    $("#view-rename-dialog").dialog({
+    $("#rename-view-dialog").dialog({
             modal: true,
             width: 500,
             height: 200,
@@ -242,8 +258,8 @@ function initViewPage() {
             title: "Rename"
     });
     $("#rename-view").click(renameView);
-    $("#view-add-row").click(addViewRow);
-    $("#add-view-item").change(addViewItem);
+    $("#view-add-row").click(addViewRowAndSave);
+    $("#add-view-item").change(addViewItemAndSave);
     $("#view-rows").sortable({stop:saveView});
 
     for(var i = 0; i < currentSubPage.rows.length; i++) {

@@ -1,0 +1,39 @@
+#header {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+#navigation {
+    display: block;
+    width: 100%;
+    text-align: center;
+}
+
+ul {
+    list-style: none;
+    text-align: center;
+    padding: 0px;
+}
+
+li {
+    display: inline-block;
+}
+
+#navigation a {
+    width: 200px;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #000000;
+    background-color: #eeeeee;
+}
+
+#navigation a:hover {
+    border: 1px solid #ff9900;
+    background-color: #ee8800;
+}
+
+#content {
+    display: table;
+    width: 100%;
+}

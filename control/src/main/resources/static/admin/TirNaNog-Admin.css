@@ -2,10 +2,106 @@
     visibility: hidden;
 }
 
+/* admin navigation css */
+
+#views-navigation a {
+    width: 200px;
+    margin: 5px;
+    padding: 5px;
+    border: 1px solid #000000;
+    background-color: #eeeeee;
+}
+
+#views-navigation a:hover {
+    border: 1px solid #ff9900;
+    background-color: #ee8800;
+}
+
+
+
+
+/* View editing related css */
+
+#views-navigation {
+    display: table-cell;
+    width: 180px;
+    margin-right: 10px;
+}
+
+#views-navigation ul {
+    margin: 0px;
+}
+
+#views-navigation li {
+    display: inline-block;
+    padding: 10px;
+}
+
+#views-navigation a {
+    width: 100%;
+}
+
+#views-navigation a.delete {
+    margin-left: -10px;
+}
+
+#view-name {
+    display: inline-block;
+    width: auto;
+}
+
+#view-name p {
+    display: inline-block;
+}
+
+
+
+#views-content {
+    display: table-cell;
+    padding: 10px;
+    width: 100%;
+}
+
 #view-rows div.viewRow {
-    min-height: 200px;
-    border: 1px solid;
+    min-height: 25px;
+    border: 1px solid #000000;
     margin: 5px;
     padding: 5px;
     background-color: #dddddd;
+}
+
+#view-rows div.selected {
+    border: 1px solid #ff9900;
+}
+
+#view-rows div.viewItem {
+    display: inline-block;
+    border: 1px solid;
+    margin: 5px;
+    padding: 5px;
+    background-color: #eeeeee;
+    vertical-align: top;
+    height: 110px;
+}
+
+#view-rows div.viewItem h1 {
+    font-size: 1.1em;
+    font-weight: bold;
+    margin: 0px;
+}
+
+#view-rows div.viewItem div.viewItemInput {
+    display: block;
+    height: 1.4em;
+}
+
+#view-rows div.viewItem div.viewItemInput p {
+    display: inline-block;
+    width: 110px;
+    margin: 0px;
+}
+
+#view-rows div.viewItem div.viewItemInput input {
+    display: inline;
+    width: 140px;
 }
