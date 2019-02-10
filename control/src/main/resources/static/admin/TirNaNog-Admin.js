@@ -15,24 +15,26 @@ function saveView() {
         var pageItems = [];
         var pageItemsFromDom = rowFromDom.children;
         for(var j = 0; j < pageItemsFromDom.length; j++) {
-            var pageItemFromDom = pageItemsFromDom[j];
-            var pageItem = {type: pageItemFromDom.attr("class")}
-            switch(pageItem.type) {
-                case "GraphPageItem":
-                    pageItem.recordName = pageItemFromDom.children('input[name="recordName"]').val();
-                    pageItem.recordValue = pageItemFromDom.children('input[name="recordValue"]').val();
-                    pageItem.updateDelay = pageItemFromDom.children('input[name="updateDelay"]').val();
-                    pageItem.numberOfValuesToUse = pageItemFromDom.children('input[name="numberOfValuesToUse"]').val();
-                    break;
-                case "ParameterPageItem":
-                    pageItem.parameterPath = pageItemFromDom.children('input[name="parameterPath"]').val();
-                    break;
-                case "SingleRecordPageItem":
-                    pageItem.recordName = pageItemFromDom.children('input[name="recordName"]').val();
-                    pageItem.valuesToDisplay = pageItemFromDom.children('input[name="valuesToDisplay"]').val();
-                    break;
+            if($(pageItemsFromDom[j]).text() != "X") {
+                var pageItemFromDom = pageItemsFromDom[j];
+                var pageItem = {type: $(pageItemFromDom).attr("class").split(" ")[0]}
+                switch(pageItem.type) {
+                    case "GraphPageItem":
+                        pageItem.recordName = pageItemFromDom.children('input[name="recordName"]').val();
+                        pageItem.recordValue = pageItemFromDom.children('input[name="recordValue"]').val();
+                        pageItem.updateDelay = pageItemFromDom.children('input[name="updateDelay"]').val();
+                        pageItem.numberOfValuesToUse = pageItemFromDom.children('input[name="numberOfValuesToUse"]').val();
+                        break;
+                    case "ParameterPageItem":
+                        pageItem.parameterPath = pageItemFromDom.children('input[name="parameterPath"]').val();
+                        break;
+                    case "SingleRecordPageItem":
+                        pageItem.recordName = pageItemFromDom.children('input[name="recordName"]').val();
+                        pageItem.valuesToDisplay = pageItemFromDom.children('input[name="valuesToDisplay"]').val();
+                        break;
+                }
+                pageItems.push(pageItem);
             }
-            pageItems.push(pageItem);
         }
         rows.push({"pageItems": pageItems});
     }
@@ -89,16 +91,18 @@ function selectViewRow() {
 }
 
 function deleteViewElement(e) {
+    e.preventDefault();
     e.target.parentElement.remove();
     saveView();
 }
 
 function addViewRow() {
-    $("#view-rows").append("<div class=\"viewRow\"></div>");
+    $("#view-rows").append("<div class=\"viewRow\"><a href=\"#\" class=\"delete\">X</a></div>");
     if($("#view-rows > div").length == 1) {
         $("#view-rows > div").addClass("selected");
     }
     $("#view-rows > div:last").click(selectViewRow);
+    $("#view-rows > div:last > a.delete").click(deleteViewElement);
     $("#view-rows > div:last").sortable({stop:saveView});
 }
 
@@ -126,10 +130,12 @@ function addViewItem(type) {
             viewItem = recordNameInput + valuesToDisplayInput;
             break;
     }
-    viewItem = "<div class=\"viewItem\"><h1>" + $("#add-view-item > option[value='" + type + "']").text() + "</h1>" + viewItem + "</div>";
+    viewItem = "<div class=\"" + type + " viewItem\"><a href=\"#\" class=\"delete\">X</a><h1>" + $("#add-view-item > option[value='" + type + "']").text() + "</h1>" + viewItem + "</div>";
+
     $("#view-rows > div.selected").append(viewItem);
     $("#add-view-item").prop("selectedIndex", "");
-    $("#view-rows > div.selected > div.viewItemInput:last > input").change(saveView);
+    $("#view-rows > div.selected").find("div.viewItem:last").find("input").change(saveView);
+    $("#view-rows > div.selected").find("div.viewItem:last").find("a.delete").click(deleteViewElement);
 }
 
 function addViewItemAndSave(e) {

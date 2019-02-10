@@ -23,7 +23,6 @@
 /* View editing related css */
 
 #views-navigation {
-    display: table-cell;
     width: 180px;
     margin-right: 10px;
 }
@@ -62,6 +61,11 @@
     width: 100%;
 }
 
+#view-rows .delete {
+    float: right;
+    display: inline;
+}
+
 #view-rows div.viewRow {
     min-height: 25px;
     border: 1px solid #000000;
@@ -88,6 +92,7 @@
     font-size: 1.1em;
     font-weight: bold;
     margin: 0px;
+    display: inline-block;
 }
 
 #view-rows div.viewItem div.viewItemInput {
