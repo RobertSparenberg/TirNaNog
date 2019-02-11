@@ -8,6 +8,7 @@ import net.frozenchaos.TirNaNog.web.pages.PageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.ArrayList;
@@ -40,7 +41,7 @@ public class PageRestController {
         return pages;
     }
 
-    @RequestMapping("/pages/page/{pageName}")
+    @RequestMapping(value = "/pages/page/{pageName}", method = RequestMethod.GET)
     public Page getPage(@PathVariable String pageName) {
         return pageRepository.findByName(pageName.replace('_', ' '));
     }

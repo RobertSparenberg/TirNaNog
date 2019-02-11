@@ -45,12 +45,22 @@
 }
 
 #view-name {
-    display: inline-block;
-    width: auto;
+    width: 100%;
+    text-align: center;
 }
 
 #view-name p {
     display: inline-block;
+    margin: 0px;
+    margin-right: 10px;
+    font-size: 1.4em;
+    font-weight: bold;
+}
+
+#view-name a {
+    margin-bottom: 0.4em;
+    font-size: 0.6em;
+    vertical-align: top;
 }
 
 

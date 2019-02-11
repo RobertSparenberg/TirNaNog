@@ -20,17 +20,17 @@ function saveView() {
                 var pageItem = {type: $(pageItemFromDom).attr("class").split(" ")[0]}
                 switch(pageItem.type) {
                     case "GraphPageItem":
-                        pageItem.recordName = pageItemFromDom.children('input[name="recordName"]').val();
-                        pageItem.recordValue = pageItemFromDom.children('input[name="recordValue"]').val();
-                        pageItem.updateDelay = pageItemFromDom.children('input[name="updateDelay"]').val();
-                        pageItem.numberOfValuesToUse = pageItemFromDom.children('input[name="numberOfValuesToUse"]').val();
+                        pageItem.recordName = $(pageItemFromDom).find('input[name="recordName"]').val();
+                        pageItem.recordValue = $(pageItemFromDom).find('input[name="recordValue"]').val();
+                        pageItem.updateDelay = $(pageItemFromDom).find('input[name="updateDelay"]').val();
+                        pageItem.numberOfValuesToUse = $(pageItemFromDom).find('input[name="numberOfValuesToUse"]').val();
                         break;
                     case "ParameterPageItem":
-                        pageItem.parameterPath = pageItemFromDom.children('input[name="parameterPath"]').val();
+                        pageItem.parameterPath = $(pageItemFromDom).find('input[name="parameterPath"]').val();
                         break;
                     case "SingleRecordPageItem":
-                        pageItem.recordName = pageItemFromDom.children('input[name="recordName"]').val();
-                        pageItem.valuesToDisplay = pageItemFromDom.children('input[name="valuesToDisplay"]').val();
+                        pageItem.recordName = $(pageItemFromDom).find('input[name="recordName"]').val();
+                        pageItem.valuesToDisplay = $(pageItemFromDom).find('input[name="valuesToDisplay"]').val();
                         break;
                 }
                 pageItems.push(pageItem);
@@ -39,18 +39,19 @@ function saveView() {
         rows.push({"pageItems": pageItems});
     }
 
-    var viewObject = {"name": $("#view-name p:first").text(),
-                      "order": -1,
-                      "rows": rows
+    var viewObject = {name: $("#view-name p:first").text(),
+                      order: -1,
+                      rows: rows
     };
     $.ajax({type: "POST",
             headers: {
                 'Accept': 'application/json',
                 'Content-Type': 'application/json'
             },
-            url: "/rest/admin/pages/page/views/save_order",
+            url: "/rest/admin/pages/page/views/view/" + currentSubPage.name.replace(/ /g, "_"),
             data: JSON.stringify(viewObject),
             dataType: "json"});
+    currentSubPage.name = viewObject.name;
 }
 
 function renameView(e) {
@@ -62,7 +63,7 @@ function renameView(e) {
             click: function() {
                 $(this).dialog("close");
                 $("#rename-view-dialog-error").text("");
-                $("#new-name-input").value(oldName);
+                $("#new-name-input").val(oldName);
             }
         },
         {

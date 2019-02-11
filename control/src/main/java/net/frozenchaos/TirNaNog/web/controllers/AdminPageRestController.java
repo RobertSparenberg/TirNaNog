@@ -7,7 +7,6 @@ import net.frozenchaos.TirNaNog.explorer.OwnConfigService;
 import net.frozenchaos.TirNaNog.web.pages.Page;
 import net.frozenchaos.TirNaNog.web.pages.PageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
@@ -62,18 +61,25 @@ public class AdminPageRestController {
         pageRepository.save(newPageList);
     }
 
-    @RequestMapping(value = "/pages/page/views/view/{originalPageName}/save", method = RequestMethod.POST)
-    public void savePage(@PathVariable String originalPageName, @RequestBody Page page) {
-        originalPageName = originalPageName.replace('_', ' ');
-        Page originalPage = pageRepository.findByName(originalPageName);
-        if(originalPage != null) {
-            if(!originalPageName.equals(page.getName()) && !StringUtils.isEmpty(page.getName())) {
-                if(pageRepository.findByName(page.getName()) == null) {
-                    originalPage.setName(page.getName());
-                }
-            }
-            originalPage.setRows(page.getRows());
-            pageRepository.save(originalPage);
-        }
+//    @RequestMapping(value = "/pages/page/views/view/{originalPageName}/save", method = RequestMethod.POST)
+//    public void savePage(@PathVariable String originalPageName, @RequestBody Page page) {
+//        originalPageName = originalPageName.replace('_', ' ');
+//        Page originalPage = pageRepository.findByName(originalPageName);
+//        if(originalPage != null) {
+//            if(!originalPageName.equals(page.getName()) && !StringUtils.isEmpty(page.getName())) {
+//                if(pageRepository.findByName(page.getName()) == null) {
+//                    originalPage.setName(page.getName());
+//                }
+//            }
+//            originalPage.setRows(page.getRows());
+//            pageRepository.save(originalPage);
+//        }
+//    }
+
+    @RequestMapping(value = "/pages/page/views/view/{pageName}", method = RequestMethod.POST)
+    public void savePage(@RequestBody Page page, @PathVariable String pageName) {
+        Page originalPage = pageRepository.findByName(pageName.replace('_', ' '));
+        pageRepository.delete(originalPage);
+        pageRepository.save(page);
     }
 }
