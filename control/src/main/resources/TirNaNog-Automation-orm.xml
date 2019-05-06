@@ -13,7 +13,7 @@
         <attributes>
             <id name="id">
                 <column name="trigger_id" unique="true" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
+                <generated-value strategy="AUTO"/>
             </id>
             <basic name="parameterPath">
                 <column name="parameter_path"/>
@@ -26,7 +26,7 @@
         <attributes>
             <id name="id">
                 <column name="action_id" unique="true" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
+                <generated-value strategy="AUTO"/>
             </id>
         </attributes>
     </entity>
@@ -36,7 +36,7 @@
         <attributes>
             <id name="id">
                 <column name="record_value_id" unique="true" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
+                <generated-value strategy="AUTO"/>
             </id>
             <basic name="timestamp">
                 <column name="timestamp" nullable="false"/>
@@ -70,7 +70,7 @@
         <attributes>
             <id name="id">
                 <column name="rule_id" unique="true" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
+                <generated-value strategy="AUTO"/>
             </id>
             <one-to-many name="triggers" fetch="EAGER" orphan-removal="true" target-entity="net.frozenchaos.TirNaNog.automation.triggers.Trigger">
                 <order-column name="trigger_order"/>
@@ -225,7 +225,7 @@
         <attributes>
             <id name="id">
                 <column name="record_id" unique="true" nullable="false"/>
-                <generated-value strategy="IDENTITY"/>
+                <generated-value strategy="AUTO"/>
             </id>
             <basic name="name">
                 <column name="name" nullable="false"/>

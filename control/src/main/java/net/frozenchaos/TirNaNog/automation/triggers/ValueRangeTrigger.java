@@ -9,7 +9,7 @@ public class ValueRangeTrigger extends Trigger {
 
     @Override
     public boolean isTriggered(Parameter parameter) {
-        if(parameter instanceof IntegerParameter && this.getParameterPath().equals(parameter.getParameterDefinitionPath()) && parameter.getValue() != null) {
+        if(parameter instanceof IntegerParameter && this.getParameterPath().equals(parameter.getName()) && parameter.getValue() != null) {
             return (int) parameter.getValue() >= minimumValue && (int) parameter.getValue() <= maximumValue;
         }
         return false;

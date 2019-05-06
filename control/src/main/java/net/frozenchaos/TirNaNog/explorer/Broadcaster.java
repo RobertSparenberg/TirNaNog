@@ -29,7 +29,7 @@ public class Broadcaster {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
     private final OwnConfigService ownConfigService;
-//    private final Telephone telephone;
+    private final NotificationService notificationService;
 
     private final DatagramSocket broadcastSocket;
     private final DatagramSocket listenSocket;
@@ -38,11 +38,11 @@ public class Broadcaster {
 
     private boolean stopRequested = false;
 
-    public Broadcaster(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, Timer timer, Properties properties) throws IOException, JAXBException {
+    public Broadcaster(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, NotificationService notificationService, Timer timer, Properties properties) throws IOException, JAXBException {
         this.ownConfigService = ownConfigService;
         logger.trace("Broadcaster initializing");
         this.moduleConfigRepository = moduleConfigRepository;
-//        this.telephone = telephone;
+        this.notificationService = notificationService;
 
         broadcastSocket = new DatagramSocket();
         broadcastSocket.setBroadcast(true);
@@ -91,8 +91,7 @@ public class Broadcaster {
                         moduleConfig.setIp(receivedBroadcast.getAddress().getHostAddress());
                         logger.trace("Broadcaster saving moduleconfig: "+moduleConfig.toString());
                         moduleConfigRepository.save(moduleConfig);
-//                        moduleConfig = moduleConfigRepository.save(moduleConfig);
-//                        telephone.addContactToRing(moduleConfig);
+                        notificationService.onModuleDiscovery(moduleConfig);
                     }
                 }
             } catch(Exception e) {

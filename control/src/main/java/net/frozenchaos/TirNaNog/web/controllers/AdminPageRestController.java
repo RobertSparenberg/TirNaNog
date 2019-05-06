@@ -6,6 +6,7 @@ import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.explorer.OwnConfigService;
 import net.frozenchaos.TirNaNog.web.pages.Page;
 import net.frozenchaos.TirNaNog.web.pages.PageRepository;
+import org.slf4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/rest/admin")
 public class AdminPageRestController {
+    private final Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
     private final OwnConfigService ownConfigService;
     private final ModuleConfigRepository moduleConfigRepository;
     private final FunctionRepository functionRepository;
@@ -61,25 +63,17 @@ public class AdminPageRestController {
         pageRepository.save(newPageList);
     }
 
-//    @RequestMapping(value = "/pages/page/views/view/{originalPageName}/save", method = RequestMethod.POST)
-//    public void savePage(@PathVariable String originalPageName, @RequestBody Page page) {
-//        originalPageName = originalPageName.replace('_', ' ');
-//        Page originalPage = pageRepository.findByName(originalPageName);
-//        if(originalPage != null) {
-//            if(!originalPageName.equals(page.getName()) && !StringUtils.isEmpty(page.getName())) {
-//                if(pageRepository.findByName(page.getName()) == null) {
-//                    originalPage.setName(page.getName());
-//                }
-//            }
-//            originalPage.setRows(page.getRows());
-//            pageRepository.save(originalPage);
-//        }
-//    }
-
     @RequestMapping(value = "/pages/page/views/view/{pageName}", method = RequestMethod.POST)
     public void savePage(@RequestBody Page page, @PathVariable String pageName) {
         Page originalPage = pageRepository.findByName(pageName.replace('_', ' '));
+        page.setOrder(originalPage.getOrder());
         pageRepository.delete(originalPage);
-        pageRepository.save(page);
+        try {
+            Page savedPage = pageRepository.save(page);
+            int i = 0;
+        } catch(Exception e) {
+            logger.error("Error saving page: " + page.toString() + ", exception: " + e.toString());
+            pageRepository.save(originalPage);
+        }
     }
 }

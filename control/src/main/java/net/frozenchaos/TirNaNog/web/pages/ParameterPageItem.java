@@ -1,14 +1,14 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
 public class ParameterPageItem extends PageItem {
-    private String parameterPath;
+    private String parameterPath = "";
 
     public ParameterPageItem() {
         super();
     }
 
     public ParameterPageItem(long id, int width, String parameterPath) {
-        super(id, width);
+        super(id);
         this.parameterPath = parameterPath;
     }
 

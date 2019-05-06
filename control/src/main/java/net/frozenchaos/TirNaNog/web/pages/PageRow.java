@@ -1,10 +1,10 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
 public class PageRow {
-    private long id;
-    PageItem pageItems[];
+    private Long id;
+    private PageItem pageItems[];
 
-    public long getId() {
+    public Long getId() {
         return id;
     }
 

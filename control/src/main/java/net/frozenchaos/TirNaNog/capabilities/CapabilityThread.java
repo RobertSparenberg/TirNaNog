@@ -1,8 +1,8 @@
 package net.frozenchaos.TirNaNog.capabilities;
 
-import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.capabilities.parameters.EnumParameter;
 import net.frozenchaos.TirNaNog.capabilities.parameters.IntegerParameter;
+import net.frozenchaos.TirNaNog.explorer.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,16 +16,16 @@ import java.net.Socket;
 class CapabilityThread extends Thread {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final OwnCapabilityApplicationsService capabilityApplicationService;
-    private final AutomationControl automationControl;
+    private final NotificationService notificationService;
 
     private Socket socket;
     private CapabilityApplication profile = new CapabilityApplication("Unknown");
     private boolean stopRequested;
 
-    CapabilityThread(Socket socket, OwnCapabilityApplicationsService capabilityApplicationService, AutomationControl automationControl) {
+    CapabilityThread(Socket socket, OwnCapabilityApplicationsService capabilityApplicationService, NotificationService notificationService) {
         this.socket = socket;
         this.capabilityApplicationService = capabilityApplicationService;
-        this.automationControl = automationControl;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -76,9 +76,9 @@ class CapabilityThread extends Thread {
                     profile = JAXB.unmarshal(new StringReader(xml), CapabilityApplication.class);
                 }
             } else if(EnumParameter.class.getSimpleName().equals(className)) {
-                automationControl.onParameter(JAXB.unmarshal(new StringReader(xml), EnumParameter.class));
+                notificationService.onLocalParameter(profile.getName(), JAXB.unmarshal(new StringReader(xml), EnumParameter.class));
             } else if(IntegerParameter.class.getSimpleName().equals(className)) {
-                automationControl.onParameter(JAXB.unmarshal(new StringReader(xml), IntegerParameter.class));
+                notificationService.onLocalParameter(profile.getName(), JAXB.unmarshal(new StringReader(xml), IntegerParameter.class));
             }
         } catch(Exception e) {
             logger.error("Error unmarshalling capability message", xml, e);

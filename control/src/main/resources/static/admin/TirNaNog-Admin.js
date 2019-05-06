@@ -17,7 +17,7 @@ function saveView() {
         for(var j = 0; j < pageItemsFromDom.length; j++) {
             if($(pageItemsFromDom[j]).text() != "X") {
                 var pageItemFromDom = pageItemsFromDom[j];
-                var pageItem = {type: $(pageItemFromDom).attr("class").split(" ")[0]}
+                var pageItem = {"@type": $(pageItemFromDom).attr("class").split(" ")[0]}
                 switch(pageItem.type) {
                     case "GraphPageItem":
                         pageItem.recordName = $(pageItemFromDom).find('input[name="recordName"]').val();

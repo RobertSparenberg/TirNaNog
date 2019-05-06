@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.XmlType;
 
 @XmlSeeAlso({ByteArrayParameterDefinition.class, EnumParameterDefinition.class, IntegerParameterDefinition.class})
 @XmlType
-public abstract class ParameterDefinition {
+public abstract class ParameterDefinition<T> {
     private String name;
     private ParameterType parameterType;
 

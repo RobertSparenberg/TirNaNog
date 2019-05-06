@@ -43,15 +43,11 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
         if(!this.started) {
             logger.info("Initializing TirNaNog device explorer");
             try {
-//                telephone = new Telephone(moduleConfigRepository, capabilityServer, timer);
                 broadcaster = new Broadcaster(moduleConfigRepository, ownConfigService, timer, properties);
                 started = true;
                 logger.info("TirNaNog device explorer initialized");
             } catch(Exception e) {
                 logger.error("Error initializing the TirNaNog device Explorer, shutting down the explorer", e);
-//                if(telephone != null) {
-//                    telephone.destroyGracefully();
-//                }
                 if(broadcaster != null) {
                     broadcaster.destroyGracefully();
                 }

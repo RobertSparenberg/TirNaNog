@@ -1,15 +1,15 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
 public class SingleRecordPageItem extends PageItem {
-    private String recordName;
-    private String valuesToDisplay;
+    private String recordName = "";
+    private String valuesToDisplay = "";
 
     public SingleRecordPageItem() {
         super();
     }
 
     public SingleRecordPageItem(long id, int width, String recordName, String valuesToDisplay) {
-        super(id, width);
+        super(id);
         this.recordName = recordName;
         this.valuesToDisplay = valuesToDisplay;
     }

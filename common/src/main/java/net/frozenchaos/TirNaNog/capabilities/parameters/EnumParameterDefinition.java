@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 @XmlRootElement
-public class EnumParameterDefinition extends ParameterDefinition {
+public class EnumParameterDefinition extends ParameterDefinition<Enum> {
     private Set<String> values = new HashSet<>();
 
     public EnumParameterDefinition() {

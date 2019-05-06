@@ -79,6 +79,7 @@ public class CapabilityServer {
         }
         capabilityApplicationsService.setStopRequested();
         for(CapabilityThread capability : capabilityApplicationsService.getRunningCapabilities()) {
+            capability.stopGracefully();
             capabilityApplicationsService.removeCapabilityApplication(capability);
         }
     }

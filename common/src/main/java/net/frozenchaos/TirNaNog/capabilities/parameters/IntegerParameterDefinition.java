@@ -4,7 +4,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class IntegerParameterDefinition extends ParameterDefinition {
+public class IntegerParameterDefinition extends ParameterDefinition<Integer> {
     private int rangeMinimum;
     private int rangeMaximum;
 

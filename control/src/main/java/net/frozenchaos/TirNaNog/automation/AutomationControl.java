@@ -38,9 +38,9 @@ public class AutomationControl {
         functions = functionRepository.findAll();
     }
 
-    public void onParameter(Parameter parameter) {
+    public void onParameter(String namespace, Parameter parameter) {
         for(Function function : functions) {
-            function.onParameter(parameter, this);
+            function.onParameter(namespace, parameter, this);
         }
     }
 

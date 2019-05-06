@@ -1,68 +1,49 @@
 package net.frozenchaos.TirNaNog.explorer;
 
+import net.frozenchaos.TirNaNog.automation.AutomationControl;
+import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
+import net.frozenchaos.TirNaNog.data.ModuleConfig;
+import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
+
+import java.io.IOException;
+import java.net.ServerSocket;
+
 /**
- * Todo: The telephone is still needed to retrieve updates from other nodes, but it doesn't actually serve a purpose in discovery
- * The telephone is responsible for ringing other TirNaNog devices to tell them about this modules IP.
- * Additionally it is responsible for being rang and being told other modules their IP if they've changed.
- *
- * So the singular concern is synchronizing IP addresses between TirNaNog modules.
- *
- * A module knows what the last IP is that they've broadcast through the Broadcaster class.
- * Any module that hasn't responded through the Telephone is considered to know this module by its old IP.
+ * The NotificationService is responsible for sending notifications to specific modules and receiving them.
+ * This is used to subscribe to parameters from other modules, making them send a notification to this module
+ * when one of those parameters is fired.
+ * It will receive subscribed parameters and send parameters to other modules if they subscribed to it.
  */
-public class Telephone {
-    /*
+@Service
+public class NotificationService {
     private static final int SOCKET_TIMEOUT = 5000;
-    private static final int DELAY_BETWEEN_CALLS = 2000;
-    private static final int TELEPHONE_PORT = 42002;
+    private static final int DELAY_BETWEEN_NOTIFICATIONS = 2000;
+    private static final int RETRY_ATTEMPTS = 3;
+    private static final int NOTIFICATION_PORT = 42002;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
-    private final Queue<ModuleConfig> scheduledCalls = new ConcurrentLinkedDeque<>();
+    private final AutomationControl automationControl;
     private final ServerSocket serverSocket;
-    private final Socket clientSocket;
-
-    private final Thread inboundThread;
-    private final byte[] marshaledOwnConfig;
     private final String ownName;
 
     private boolean stopRequested = false;
 
-    public Telephone(ModuleConfigRepository moduleConfigRepository, CapabilityServer timer, Timer ownCapabilities) throws IOException {
-        logger.trace("Telephone Initializing");
+    public NotificationService(OwnConfigService ownConfigService, ModuleConfigRepository moduleConfigRepository, AutomationControl automationControl) throws IOException {
+        logger.trace("NotificationService Initializing");
         this.moduleConfigRepository = moduleConfigRepository;
-        serverSocket = new ServerSocket(TELEPHONE_PORT);
-        clientSocket = new Socket();
-        clientSocket.setSoTimeout(SOCKET_TIMEOUT);
+        this.automationControl = automationControl;
+        serverSocket = new ServerSocket(NOTIFICATION_PORT);
 
         ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
         this.ownName = ownConfig.getName();
-        ownConfig.getCapabilityApplications().clear();
-        ownConfig.getCapabilityApplications().addAll(ownCapabilities);
-        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        JAXB.marshal(ownConfig, outputStream);
-        marshaledOwnConfig = outputStream.toByteArray();
-
-        inboundThread = new Thread(this::receiveCall);
-        inboundThread.start();
-
-        ScheduledTask outboundCallTask = new ScheduledTask(DELAY_BETWEEN_CALLS) {
-            @Override
-            public void doTask() {
-                try {
-                    ringOtherModule();
-                } catch(IOException e) {
-                    logger.debug("Error during ringing other module", e);
-                }
-                if(!stopRequested) {
-                    timer.addTask(this);
-                }
-            }
-        };
-        timer.addTask(outboundCallTask);
-        logger.trace("Telephone initialized");
+        logger.trace("NotificationService initialized");
     }
 
+    /*
     private void receiveCall() {
         while(!stopRequested) {
             try {
@@ -110,9 +91,14 @@ public class Telephone {
         } catch(Exception ignored) {
         }
     }
-
-    public void addContactToRing(ModuleConfig moduleConfig) {
-        scheduledCalls.add(moduleConfig);
-    }
     */
+
+    public void onLocalParameter(String capabilityName, Parameter parameter) {
+        automationControl.onParameter(ownName + '.' + capabilityName + '.' + parameter.getName(), parameter);
+    }
+
+    public void onModuleDiscovery(ModuleConfig moduleConfig) {
+        //todo: on module discovery, tell it which parameters of it this module subscribes to (use TCP to ensure delivery)
+        //it will discover this module when it broadcasts again, so no need to worry about it
+    }
 }

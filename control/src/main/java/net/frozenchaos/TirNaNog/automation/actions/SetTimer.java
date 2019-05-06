@@ -2,26 +2,25 @@ package net.frozenchaos.TirNaNog.automation.actions;
 
 import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.automation.Function;
-import net.frozenchaos.TirNaNog.automation.TimerParameterDefinition;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.capabilities.parameters.ParameterDefinition;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
 
 public class SetTimer extends Action {
-    private String name = "";
+    private final TimerParameterDefinition timerParameterDefinition = new TimerParameterDefinition();
     private int delay = 0;
 
     @Override
     public void perform(Parameter parameter, Function function, AutomationControl automationControl) {
-        if(delay > 0 && !name.isEmpty()) {
+        if(delay > 0 && !timerParameterDefinition.getName().isEmpty()) {
             automationControl.getTimer().addTask(new ScheduledTask(delay) {
                 @Override
                 public void doTask() {
                     synchronized(function) {
-                        function.onParameter(new Parameter<Long>(automationControl.getOwnModuleConfig().getName() + ".timer." + name) {
+                        function.onParameter(getTimerNamespace(automationControl), new Parameter<Long>(timerParameterDefinition) {
                             @Override
                             protected boolean matchesTypeOfDefinition(ParameterDefinition parameterDefinition) {
-                                return parameterDefinition instanceof TimerParameterDefinition && parameterDefinition.getName().equals("localhost.timer." + name);
+                                return parameterDefinition instanceof TimerParameterDefinition && parameterDefinition.getName().equals(getTimerNamespace(automationControl));
                             }
 
                             @Override
@@ -35,12 +34,16 @@ public class SetTimer extends Action {
         }
     }
 
+    private String getTimerNamespace(AutomationControl automationControl) {
+        return automationControl.getOwnModuleConfig().getName() + ".timer." + timerParameterDefinition.getName();
+    }
+
     public String getName() {
-        return name;
+        return timerParameterDefinition.getName();
     }
 
     public void setName(String name) {
-        this.name = name;
+        timerParameterDefinition.setName(name);
     }
 
     public int getDelay() {
@@ -49,5 +52,23 @@ public class SetTimer extends Action {
 
     public void setDelay(int delay) {
         this.delay = delay;
+    }
+
+    private class TimerParameterDefinition extends ParameterDefinition<Long> {
+        private String timerName = "Unnamed";
+
+        public TimerParameterDefinition() {
+            super("Timer", ParameterType.OUTPUT);
+        }
+
+        @Override
+        public String getName() {
+            return timerName;
+        }
+
+        @Override
+        public void setName(String name) {
+            timerName = name;
+        }
     }
 }

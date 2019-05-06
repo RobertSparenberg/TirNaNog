@@ -1,17 +1,17 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
 public class GraphPageItem extends PageItem {
-    private String recordName;
-    private String recordValue;
-    private int updateDelay;
-    private int numberOfValuesToUse;
+    private String recordName = "";
+    private String recordValue = "";
+    private int updateDelay = 0;
+    private int numberOfValuesToUse = 0;
 
     public GraphPageItem() {
         super();
     }
 
     public GraphPageItem(long id, int width, String recordName, String recordValue, int updateDelay, int numberOfValuesToUse) {
-        super(id, width);
+        super(id);
         this.recordName = recordName;
         this.recordValue = recordValue;
         this.updateDelay = updateDelay;

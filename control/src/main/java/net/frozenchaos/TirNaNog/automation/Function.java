@@ -16,7 +16,7 @@ public class Function {
     private String name = "New Automation Function";
     private boolean active = false;
 
-    public void onParameter(Parameter parameter, AutomationControl automationControl) {
+    public void onParameter(String namespace, Parameter parameter, AutomationControl automationControl) {
         for(Rule rule : rules) {
             rule.onParameter(parameter, this, automationControl);
         }

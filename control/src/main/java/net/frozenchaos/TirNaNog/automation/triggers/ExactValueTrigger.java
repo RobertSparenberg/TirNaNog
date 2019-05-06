@@ -7,7 +7,7 @@ public class ExactValueTrigger extends Trigger {
 
     @Override
     public boolean isTriggered(Parameter parameter) {
-         return this.getParameterPath().equals(parameter.getParameterDefinitionPath())
+         return this.getParameterPath().equals(parameter.getName())
                  && valueToMatch.equals(parameter.getValue().toString());
     }
 

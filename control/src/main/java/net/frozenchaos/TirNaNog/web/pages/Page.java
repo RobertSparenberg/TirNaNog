@@ -1,11 +1,22 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
+import java.util.List;
+
 public class Page {
+    private Long id;
     private String name;
     private int order;
-    private PageRow rows[];
+    private List<PageRow> rows;
 
     public Page() {
+    }
+
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(long id) {
+        this.id = id;
     }
 
     public Page(String name) {
@@ -28,14 +39,11 @@ public class Page {
         this.order = order;
     }
 
-    public PageRow[] getRows() {
-        if(rows == null) {
-            return new PageRow[0];
-        }
+    public List<PageRow> getRows() {
         return rows;
     }
 
-    public void setRows(PageRow rows[]) {
+    public void setRows(List<PageRow> rows) {
         this.rows = rows;
     }
 }
