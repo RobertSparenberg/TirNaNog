@@ -28,6 +28,7 @@ public class Broadcaster {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
+    //private final TriggerRepository; //todo: create repo to query for the triggers, and get their parameters to broadcast
     private final OwnConfigService ownConfigService;
     private final NotificationService notificationService;
 
@@ -36,10 +37,13 @@ public class Broadcaster {
     private final InetAddress broadcastAddress;
     private final Thread listenThread;
 
+    private final String ownModuleName;
+
     private boolean stopRequested = false;
 
     public Broadcaster(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, NotificationService notificationService, Timer timer, Properties properties) throws IOException, JAXBException {
         this.ownConfigService = ownConfigService;
+        ownModuleName = ownConfigService.getOwnConfig().getName();
         logger.trace("Broadcaster initializing");
         this.moduleConfigRepository = moduleConfigRepository;
         this.notificationService = notificationService;
@@ -77,7 +81,6 @@ public class Broadcaster {
     }
 
     private void receiveBroadcast() {
-        String ownModuleName = ownConfigService.getOwnConfig().getName();
         while(!stopRequested) {
             try {
                 byte[] buffer = new byte[1024];
@@ -104,13 +107,16 @@ public class Broadcaster {
         byte[] ownConfig = getMarshaledOwnConfig();
         DatagramPacket packet = new DatagramPacket(ownConfig, ownConfig.length, broadcastAddress, BROADCAST_PORT);
         broadcastSocket.send(packet);
-        logger.trace("Sending broacast");
+        logger.trace("Sending broadcast");
         broadcastSocket.close();
     }
 
     private byte[] getMarshaledOwnConfig() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-        JAXB.marshal(ownConfigService.getOwnConfig(), outputStream);
+        ModuleConfig ownConfig = ownConfigService.getOwnConfig();
+//        List<String> subscribedParameters = ; //todo: get the list of parameters (that aren't part of this module)
+//        ownConfig.setSubscribedParameters(subscribedParameters);
+        JAXB.marshal(ownConfig, outputStream);
         return outputStream.toByteArray();
     }
 

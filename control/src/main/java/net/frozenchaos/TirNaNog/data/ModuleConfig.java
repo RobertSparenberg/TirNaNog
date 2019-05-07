@@ -1,10 +1,9 @@
 package net.frozenchaos.TirNaNog.data;
 
-import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
-
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
+import java.util.List;
 
 @XmlRootElement
 public class ModuleConfig implements Serializable {
@@ -13,7 +12,8 @@ public class ModuleConfig implements Serializable {
     private long lastMessageTimestamp;
     private boolean hardwareInterfaceOnly;
     //this has to be an array for JPA reasons, it cannot find the type of the list if used as a list
-    private CapabilityApplication capabilityApplications[];
+//    private CapabilityApplication capabilityApplications[];
+    private List<String> subscribedParameters;
 
     public ModuleConfig() {
     }
@@ -59,13 +59,22 @@ public class ModuleConfig implements Serializable {
         this.hardwareInterfaceOnly = isDumb;
     }
 
-    @XmlElement(name="capability_applications")
-    public CapabilityApplication[] getCapabilityApplications() {
-        return capabilityApplications;
+//    @XmlElement(name="capability_applications")
+//    public CapabilityApplication[] getCapabilityApplications() {
+//        return capabilityApplications;
+//    }
+//
+//    public void setCapabilityApplications(CapabilityApplication[] capabilityApplications) {
+//        this.capabilityApplications = capabilityApplications;
+//    }
+
+    @XmlElement(name="subscribed_parameters")
+    public List<String> getSubscribedParameters() {
+        return subscribedParameters;
     }
 
-    public void setCapabilityApplications(CapabilityApplication[] capabilityApplications) {
-        this.capabilityApplications = capabilityApplications;
+    public void setSubscribedParameters(List<String> subscribedParameters) {
+        this.subscribedParameters = subscribedParameters;
     }
 
     @Override

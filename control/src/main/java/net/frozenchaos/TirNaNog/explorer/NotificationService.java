@@ -4,12 +4,21 @@ import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
+import net.frozenchaos.TirNaNog.utils.ScheduledTask;
+import net.frozenchaos.TirNaNog.utils.Timer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import javax.xml.bind.JAXB;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.StringReader;
 import java.net.ServerSocket;
+import java.net.Socket;
+import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The NotificationService is responsible for sending notifications to specific modules and receiving them.
@@ -27,78 +36,122 @@ public class NotificationService {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
     private final AutomationControl automationControl;
-    private final ServerSocket serverSocket;
+    private final ServerSocket notificationServerSocket;
     private final String ownName;
+    private final Thread exchangeListenThread;
+    private final Timer timer;
+
+    private final ConcurrentHashMap<String, Long> parameterTimestamps = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, List<String>> parameterRegistrations = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, ModuleConfig> moduleListings = new ConcurrentHashMap<>();
 
     private boolean stopRequested = false;
 
-    public NotificationService(OwnConfigService ownConfigService, ModuleConfigRepository moduleConfigRepository, AutomationControl automationControl) throws IOException {
+    public NotificationService(OwnConfigService ownConfigService, ModuleConfigRepository moduleConfigRepository, AutomationControl automationControl, Timer timer) throws IOException {
         logger.trace("NotificationService Initializing");
         this.moduleConfigRepository = moduleConfigRepository;
         this.automationControl = automationControl;
-        serverSocket = new ServerSocket(NOTIFICATION_PORT);
+        this.timer = timer;
+        notificationServerSocket = new ServerSocket(NOTIFICATION_PORT);
 
-        ModuleConfig ownConfig = moduleConfigRepository.findByIp("localhost");
+        ModuleConfig ownConfig = ownConfigService.getOwnConfig();
         this.ownName = ownConfig.getName();
+
+        exchangeListenThread = new Thread() {
+            @Override
+            public void run() {
+                receiveNotifications();
+            }
+        };
+        exchangeListenThread.start();
         logger.trace("NotificationService initialized");
     }
 
-    /*
-    private void receiveCall() {
+    private void receiveNotifications() {
         while(!stopRequested) {
             try {
-                Socket socket = this.serverSocket.accept();
+                Socket socket = notificationServerSocket.accept();
                 StringBuilder stringBuilder = new StringBuilder();
                 BufferedReader reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 String line;
                 while((line = reader.readLine()) != null) {
                     stringBuilder.append(line);
                 }
-                logger.trace("received telephone xml: " + stringBuilder.toString());
-                //todo: find a simpler way to unmarshall the string
-                ModuleConfig moduleConfig = JAXB.unmarshal(new StringReader(stringBuilder.toString().trim()), ModuleConfig.class);
-                if(!ownName.equals(moduleConfig.getName())) {
-                    moduleConfig.setLastMessageTimestamp(System.currentTimeMillis());
-                    moduleConfig.setIp(socket.getInetAddress().toString());
-                    logger.trace("Broadcaster saving moduleconfig: " + moduleConfig.toString());
-                    moduleConfigRepository.save(moduleConfig);
+                Parameter parameter = JAXB.unmarshal(new StringReader(stringBuilder.toString()), Parameter.class);
+                logger.trace("Received notification xml: " + stringBuilder.toString());
+                if(!ownName.equals(parameter.getName())) {
+                    automationControl.onParameter(parameter.getQualifier(), parameter);
                 }
-            } catch(SocketTimeoutException ignored) {
             } catch(Exception e) {
-                logger.error("Error accepting incoming socket", e);
+                logger.error("Error processing incoming notification", e);
             }
         }
     }
 
-    private void ringOtherModule() throws IOException {
-        ModuleConfig moduleToRing = scheduledCalls.poll();
-        if(moduleToRing != null) {
-            logger.trace("Telephone is ringing other module: " + moduleToRing.getIp());
-            clientSocket.connect(new InetSocketAddress(moduleToRing.getIp(), TELEPHONE_PORT));
-            clientSocket.getOutputStream().write(marshaledOwnConfig);
-            clientSocket.close();
+    private void sendParameterNotification(Parameter parameterToSend) throws IOException {
+        parameterToSend.setQualifier(ownName + ".parameter." + parameterToSend.getName());
+        parameterToSend.setTimestamp(timer.getTime());
+        parameterTimestamps.put(parameterToSend.getQualifier(), parameterToSend.getTimestamp());
+        for(String destinationName : parameterRegistrations.get(parameterToSend.getQualifier())) {
+            ModuleConfig destination = moduleListings.get(destinationName);
+            if(destination != null) {
+                timer.addTask(new ParameterSendTask(parameterToSend, destination));
+            }
         }
     }
-
-    public void destroyGracefully() {
-        this.stopRequested = true;
-        try {
-            serverSocket.close();
-        } catch(Exception ignored) {
-        }
-        try {
-            inboundThread.join(SOCKET_TIMEOUT+1000);
-        } catch(Exception ignored) {
-        }
-    }
-    */
 
     public void onLocalParameter(String capabilityName, Parameter parameter) {
         automationControl.onParameter(ownName + '.' + capabilityName + '.' + parameter.getName(), parameter);
     }
 
     public void onModuleDiscovery(ModuleConfig moduleConfig) {
-        //todo: on module discovery, tell it which parameters of it this module subscribes to (use TCP to ensure delivery)
-        //it will discover this module when it broadcasts again, so no need to worry about it
+        moduleListings.put(moduleConfig.getName(), moduleConfig);
+    }
+
+    public void destroyGracefully() {
+        this.stopRequested = true;
+        try {
+            notificationServerSocket.close();
+        } catch(Exception ignored) {
+        }
+        try {
+            exchangeListenThread.join(SOCKET_TIMEOUT+1000);
+        } catch(Exception ignored) {
+        }
+    }
+
+    /**
+     * Job wrapper that this job should be sent.
+     */
+    private class ParameterSendTask extends ScheduledTask {
+        Parameter parameterToSend;
+        ModuleConfig destination;
+        int attempts = 0;
+        int delayBeforeNextAttempt = 0;
+
+        ParameterSendTask(Parameter parameterToSend, ModuleConfig destination) {
+            super(0);
+            this.parameterToSend = parameterToSend;
+            this.destination = destination;
+        }
+
+        @Override
+        public void doTask() {
+            if(parameterTimestamps.get(parameterToSend.getQualifier()) <= parameterToSend.getTimestamp()) {
+                //only send if this is the latest parameter value to send
+                try {
+                    Socket socket = new Socket(destination.getIp(), NOTIFICATION_PORT);
+                    JAXB.marshal(parameterToSend, socket.getOutputStream());
+                    socket.close();
+                } catch(Exception e) {
+                    logger.error("Error sending notification '"+parameterToSend.getQualifier()+"' to '"+destination.getName()+':'+destination.getIp()+"' - "+e.toString());
+                    attempts += 1;
+                    if(attempts < RETRY_ATTEMPTS) {
+                        delayBeforeNextAttempt += DELAY_BETWEEN_NOTIFICATIONS;
+                        timer.addTask(this);
+                    }
+                }
+            }
+        }
     }
 }

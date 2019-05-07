@@ -15,7 +15,7 @@
                 <column name="trigger_id" unique="true" nullable="false"/>
                 <generated-value strategy="AUTO"/>
             </id>
-            <basic name="parameterPath">
+            <basic name="parameterQualifier">
                 <column name="parameter_path"/>
             </basic>
         </attributes>
@@ -140,7 +140,7 @@
         <discriminator-value>SendValueToParameter</discriminator-value>
         <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
-            <basic name="parameterPath">
+            <basic name="parameterQualifier">
                 <column name="parameter_path" nullable="false"/>
             </basic>
             <basic name="value">
@@ -154,7 +154,7 @@
         <discriminator-value>SendVariableToParameter</discriminator-value>
         <discriminator-column name="type" discriminator-type="STRING"/>
         <attributes>
-            <basic name="parameterPath">
+            <basic name="parameterQualifier">
                 <column name="parameter_path" nullable="false"/>
             </basic>
             <basic name="variableName">

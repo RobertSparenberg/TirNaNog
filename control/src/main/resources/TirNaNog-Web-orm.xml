@@ -94,7 +94,7 @@
                 <!--<column name="id" unique="true" nullable="false"/>-->
                 <!--<generated-value strategy="AUTO"/>-->
             <!--</id>-->
-            <basic name="parameterPath">
+            <basic name="parameterQualifier">
                 <column name="parameter_path" nullable="false"/>
             </basic>
             <basic name="updateDelay">

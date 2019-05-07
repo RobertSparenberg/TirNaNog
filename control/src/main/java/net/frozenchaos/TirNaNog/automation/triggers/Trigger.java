@@ -4,7 +4,7 @@ import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
 public abstract class Trigger {
     private long id;
-    private String parameterPath;
+    private String parameterQualifier;
 
     public abstract boolean isTriggered(Parameter parameter);
 
@@ -16,11 +16,11 @@ public abstract class Trigger {
         this.id = id;
     }
 
-    public String getParameterPath() {
-        return parameterPath;
+    public String getParameterQualifier() {
+        return parameterQualifier;
     }
 
-    public void setParameterPath(String parameterPath) {
-        this.parameterPath = parameterPath;
+    public void setParameterQualifier(String parameterQualifier) {
+        this.parameterQualifier = parameterQualifier;
     }
 }
