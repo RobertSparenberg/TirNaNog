@@ -3,7 +3,6 @@ package net.frozenchaos.TirNaNog.explorer;
 import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
-import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.slf4j.Logger;
@@ -19,6 +18,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 /**
  * The NotificationService is responsible for sending notifications to specific modules and receiving them.
@@ -34,7 +34,6 @@ public class NotificationService {
     private static final int NOTIFICATION_PORT = 42002;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final ModuleConfigRepository moduleConfigRepository;
     private final AutomationControl automationControl;
     private final ServerSocket notificationServerSocket;
     private final String ownName;
@@ -47,9 +46,8 @@ public class NotificationService {
 
     private boolean stopRequested = false;
 
-    public NotificationService(OwnConfigService ownConfigService, ModuleConfigRepository moduleConfigRepository, AutomationControl automationControl, Timer timer) throws IOException {
+    public NotificationService(OwnConfigService ownConfigService, AutomationControl automationControl, Timer timer) throws IOException {
         logger.trace("NotificationService Initializing");
-        this.moduleConfigRepository = moduleConfigRepository;
         this.automationControl = automationControl;
         this.timer = timer;
         notificationServerSocket = new ServerSocket(NOTIFICATION_PORT);
@@ -105,7 +103,19 @@ public class NotificationService {
     }
 
     public void onModuleDiscovery(ModuleConfig moduleConfig) {
+        //todo: right now modules can register for parameters, but they're never cleaned up.. add cleanup
         moduleListings.put(moduleConfig.getName(), moduleConfig);
+        for(String parameter : moduleConfig.getSubscribedParameters()) {
+            if(parameter.startsWith(ownName)) {
+                if(!parameterRegistrations.containsKey(parameter)) {
+                    parameterRegistrations.put(parameter, new CopyOnWriteArrayList<>());
+                }
+                List<String> parameterRegistrations = this.parameterRegistrations.get(parameter);
+                if(!parameterRegistrations.contains(moduleConfig.getName())) {
+                    parameterRegistrations.add(moduleConfig.getName());
+                }
+            }
+        }
     }
 
     public void destroyGracefully() {

@@ -1,5 +1,8 @@
 package net.frozenchaos.TirNaNog.explorer;
 
+import net.frozenchaos.TirNaNog.automation.triggers.Trigger;
+import net.frozenchaos.TirNaNog.automation.triggers.TriggerRepository;
+import net.frozenchaos.TirNaNog.capabilities.OwnCapabilityApplicationsService;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
@@ -15,6 +18,8 @@ import java.io.StringReader;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -28,8 +33,9 @@ public class Broadcaster {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
-    //private final TriggerRepository; //todo: create repo to query for the triggers, and get their parameters to broadcast
     private final OwnConfigService ownConfigService;
+    private final OwnCapabilityApplicationsService ownCapabilityApplicationsService;
+    private final TriggerRepository triggerRepository;
     private final NotificationService notificationService;
 
     private final DatagramSocket broadcastSocket;
@@ -41,8 +47,16 @@ public class Broadcaster {
 
     private boolean stopRequested = false;
 
-    public Broadcaster(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, NotificationService notificationService, Timer timer, Properties properties) throws IOException, JAXBException {
+    public Broadcaster(ModuleConfigRepository moduleConfigRepository,
+                       OwnConfigService ownConfigService,
+                       OwnCapabilityApplicationsService ownCapabilityApplicationsService,
+                       TriggerRepository triggerRepository,
+                       NotificationService notificationService,
+                       Timer timer,
+                       Properties properties) throws IOException, JAXBException {
         this.ownConfigService = ownConfigService;
+        this.ownCapabilityApplicationsService = ownCapabilityApplicationsService;
+        this.triggerRepository = triggerRepository;
         ownModuleName = ownConfigService.getOwnConfig().getName();
         logger.trace("Broadcaster initializing");
         this.moduleConfigRepository = moduleConfigRepository;
@@ -114,8 +128,14 @@ public class Broadcaster {
     private byte[] getMarshaledOwnConfig() {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ModuleConfig ownConfig = ownConfigService.getOwnConfig();
-//        List<String> subscribedParameters = ; //todo: get the list of parameters (that aren't part of this module)
-//        ownConfig.setSubscribedParameters(subscribedParameters);
+        ownConfig.setCapabilityApplications(ownCapabilityApplicationsService.getCapabilityApplications());
+        List<String> parameters = new ArrayList<>();
+        for(Trigger trigger : triggerRepository.findAll()) {
+            if(!trigger.getParameterQualifier().startsWith(ownConfig.getName())) {
+                parameters.add(trigger.getParameterQualifier());
+            }
+        }
+        ownConfig.setSubscribedParameters(parameters);
         JAXB.marshal(ownConfig, outputStream);
         return outputStream.toByteArray();
     }
