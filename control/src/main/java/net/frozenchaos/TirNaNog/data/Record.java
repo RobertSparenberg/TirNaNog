@@ -1,11 +1,23 @@
 package net.frozenchaos.TirNaNog.data;
 
+import javax.persistence.*;
 import java.util.Map;
 
+@Entity
+@Table(name = "record")
 public class Record {
+    @Id
+    @GeneratedValue
+    @Column(name = "id", nullable = false)
     private long id;
+    @Basic
+    @Column(name = "name", nullable = false)
     private String name;
+    @Basic
+    @Column(name = "timestamp", nullable = false)
     private long timestamp;
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @MapKey(name = "variable_name")
     private Map<String, RecordValue> values;
 
     public void setValue(String name, Object variable) {
