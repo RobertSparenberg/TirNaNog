@@ -4,19 +4,37 @@ import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.automation.Function;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "action_set_variable_parameter")
+@DiscriminatorValue(value = "setVariableParameter")
 public class SetVariableToParameter extends Action {
-    private String name;
+    @Basic
+    @Column(name = "variable_name", nullable = false)
+    private String variableName = "";
+    @Basic
+    @Column(name = "parameter_qualifier", nullable = false)
+    private String parameterQualifier = "";
 
     @Override
     public void perform(Parameter parameter, Function function, AutomationControl automationControl) {
-        function.setVariable(name, parameter.getValue().toString());
+        function.setVariable(variableName, parameter.getValue().toString());
     }
 
-    public String getName() {
-        return name;
+    public String getVariableName() {
+        return variableName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setVariableName(String variableName) {
+        this.variableName = variableName;
+    }
+
+    public String getParameterQualifier() {
+        return parameterQualifier;
+    }
+
+    public void setParameterQualifier(String parameterQualifier) {
+        this.parameterQualifier = parameterQualifier;
     }
 }

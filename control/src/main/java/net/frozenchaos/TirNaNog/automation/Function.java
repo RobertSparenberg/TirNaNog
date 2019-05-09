@@ -3,18 +3,29 @@ package net.frozenchaos.TirNaNog.automation;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.data.Record;
 
+import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Entity
+@Table(name = "function")
 public class Function {
-    private List<Rule> rules = new ArrayList<>();
-    private Map<String, Object> variables = new HashMap<>();
-    private Record record = null;
-
+    @Id
+    @Column(name = "name", nullable = false)
     private String name = "New Automation Function";
+    @Basic
+    @Column(name = "active", nullable = false)
     private boolean active = false;
+
+    @OneToMany
+    private List<Rule> rules = new ArrayList<>();
+    @Transient
+    private Map<String, Object> variables = new HashMap<>();
+    @OneToMany
+    @MapKey(name = "variable_name")
+    private Record record = null;
 
     public void onParameter(String namespace, Parameter parameter, AutomationControl automationControl) {
         for(Rule rule : rules) {

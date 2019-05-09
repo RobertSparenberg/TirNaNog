@@ -6,8 +6,15 @@ import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.capabilities.parameters.ParameterDefinition;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "action_set_timer")
+@DiscriminatorValue(value = "setTimer")
 public class SetTimer extends Action {
     private final TimerParameterDefinition timerParameterDefinition = new TimerParameterDefinition();
+    @Basic
+    @Column(name = "delay", nullable = false)
     private int delay = 0;
 
     @Override
@@ -38,6 +45,8 @@ public class SetTimer extends Action {
         return automationControl.getOwnModuleConfig().getName() + ".timer." + timerParameterDefinition.getName();
     }
 
+    @Basic
+    @Column(name = "name", nullable = false)
     public String getName() {
         return timerParameterDefinition.getName();
     }

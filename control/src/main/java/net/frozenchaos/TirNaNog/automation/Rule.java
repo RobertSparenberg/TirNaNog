@@ -4,12 +4,20 @@ import net.frozenchaos.TirNaNog.automation.actions.Action;
 import net.frozenchaos.TirNaNog.automation.triggers.Trigger;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
+import javax.persistence.*;
 import java.util.LinkedList;
 import java.util.List;
 
+@Entity
+@Table(name = "function_rule")
 public class Rule {
+    @Id
+    @GeneratedValue
+    @Column(name = "id", nullable = false)
     private long id;
+    @OneToMany
     private List<Trigger> triggers = new LinkedList<>();
+    @OneToMany
     private List<Action> actions = new LinkedList<>();
 
     public void onParameter(Parameter parameter, Function function, AutomationControl automationControl) {

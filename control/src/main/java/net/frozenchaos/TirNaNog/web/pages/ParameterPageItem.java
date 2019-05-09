@@ -1,22 +1,29 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "page_item_parameter")
+@DiscriminatorValue(value = "parameter")
 public class ParameterPageItem extends PageItem {
-    private String parameterPath = "";
+    @Basic
+    @Column(name = "parameter_qualifier", nullable = false)
+    private String parameterQualifier = "";
 
     public ParameterPageItem() {
         super();
     }
 
-    public ParameterPageItem(long id, int width, String parameterPath) {
+    public ParameterPageItem(long id, int width, String parameterQualifier) {
         super(id);
-        this.parameterPath = parameterPath;
+        this.parameterQualifier = parameterQualifier;
     }
 
-    public String getParameterPath() {
-        return parameterPath;
+    public String getParameterQualifier() {
+        return parameterQualifier;
     }
 
-    public void setParameterPath(String parameterPath) {
-        this.parameterPath = parameterPath;
+    public void setParameterQualifier(String parameterQualifier) {
+        this.parameterQualifier = parameterQualifier;
     }
 }

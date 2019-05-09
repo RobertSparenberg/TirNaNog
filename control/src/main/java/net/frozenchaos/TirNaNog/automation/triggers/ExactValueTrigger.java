@@ -2,8 +2,15 @@ package net.frozenchaos.TirNaNog.automation.triggers;
 
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "trigger_exact_value")
+@DiscriminatorValue(value = "exactValue")
 public class ExactValueTrigger extends Trigger {
-    private String valueToMatch;
+    @Basic
+    @Column(name = "value", nullable = false)
+    private String valueToMatch = "";
 
     @Override
     public boolean isTriggered(Parameter parameter) {

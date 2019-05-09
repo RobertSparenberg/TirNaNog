@@ -4,20 +4,30 @@ import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.automation.Function;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
+import javax.persistence.*;
+
+@Entity
+@Table(name = "action_parameter_variable")
+@DiscriminatorValue(value = "sendVariableToParameter")
 public class SendVariableToParameter extends Action {
-    private String parameterPath = "";
+    @Basic
+    @Column(name = "parameter_qualifier", nullable = false)
+    private String parameterQualifier = "";
+    @Basic
+    @Column(name = "variable_name", nullable = false)
     private String variableName = "";
 
     @Override
     public void perform(Parameter parameter, Function function, AutomationControl automationControl) {
+        //todo: send variable to parameter impl
     }
 
-    public String getParameterPath() {
-        return parameterPath;
+    public String getParameterQualifier() {
+        return parameterQualifier;
     }
 
-    public void setParameterPath(String parameterPath) {
-        this.parameterPath = parameterPath;
+    public void setParameterQualifier(String parameterQualifier) {
+        this.parameterQualifier = parameterQualifier;
     }
 
     public String getVariableName() {

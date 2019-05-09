@@ -4,8 +4,8 @@ import javax.persistence.*;
 
 @Entity
 @Table(name = "record_value")
-@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "record_type", discriminatorType = DiscriminatorType.STRING)
+@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class RecordValue {
     @Id
     @GeneratedValue

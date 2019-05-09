@@ -1,22 +1,21 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
+import javax.persistence.*;
 import java.util.List;
 
+@Entity
+@Table(name = "page")
 public class Page {
-    private Long id;
+    @Id
+    @Column(name = "name", nullable = false)
     private String name;
+    @Basic
+    @Column(name = "order", nullable = false, unique = true)
     private int order;
+    @OneToMany
     private List<PageRow> rows;
 
     public Page() {
-    }
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(long id) {
-        this.id = id;
     }
 
     public Page(String name) {

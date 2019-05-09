@@ -1,10 +1,19 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
-public class PageRow {
-    private Long id;
-    private PageItem pageItems[];
+import javax.persistence.*;
+import java.util.List;
 
-    public Long getId() {
+@Entity
+@Table(name = "page_row")
+public class PageRow {
+    @Id
+    @GeneratedValue
+    @Column(name = "id", nullable = false)
+    private long id;
+    @OneToMany
+    private List<PageItem> pageItems;
+
+    public long getId() {
         return id;
     }
 
@@ -12,14 +21,11 @@ public class PageRow {
         this.id = id;
     }
 
-    public PageItem[] getPageItems() {
-        if(pageItems == null) {
-            return new PageItem[0];
-        }
+    public List<PageItem> getPageItems() {
         return pageItems;
     }
 
-    public void setPageItems(PageItem pageItems[]) {
+    public void setPageItems(List<PageItem> pageItems) {
         this.pageItems = pageItems;
     }
 }
