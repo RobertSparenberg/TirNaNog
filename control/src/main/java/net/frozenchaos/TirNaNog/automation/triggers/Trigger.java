@@ -13,7 +13,6 @@ public abstract class Trigger {
     @GeneratedValue
     @Column(name = "id", nullable = false)
     private long id;
-    @Basic
     @Column(name = "parameter_qualifier", nullable = false)
     private String parameterQualifier = "";
 

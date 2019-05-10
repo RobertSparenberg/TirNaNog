@@ -3,16 +3,17 @@ package net.frozenchaos.TirNaNog.automation.triggers;
 import net.frozenchaos.TirNaNog.capabilities.parameters.IntegerParameter;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "trigger_value_range")
 @DiscriminatorValue(value = "valueRange")
 public class ValueRangeTrigger extends Trigger {
-    @Basic
     @Column(name = "minimum", nullable = false)
     private int minimumValue = -1;
-    @Basic
     @Column(name = "maximum", nullable = false)
     private int maximumValue = -1;
 

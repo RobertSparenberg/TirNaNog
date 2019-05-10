@@ -1,21 +1,20 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "page_item_graph")
 @DiscriminatorValue(value = "graph")
 public class GraphPageItem extends PageItem {
-    @Basic
     @Column(name = "record_name", nullable = false)
     private String recordName = "";
-    @Basic
     @Column(name = "record_value", nullable = false)
     private String recordValue = "";
-    @Basic
     @Column(name = "update_delay", nullable = false)
     private int updateDelay = 0;
-    @Basic
     @Column(name = "number_of_values_to_use", nullable = false)
     private int numberOfValuesToUse = 0;
 

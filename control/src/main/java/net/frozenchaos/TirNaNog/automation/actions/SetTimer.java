@@ -12,8 +12,8 @@ import javax.persistence.*;
 @Table(name = "action_set_timer")
 @DiscriminatorValue(value = "setTimer")
 public class SetTimer extends Action {
+    @Embedded
     private final TimerParameterDefinition timerParameterDefinition = new TimerParameterDefinition();
-    @Basic
     @Column(name = "delay", nullable = false)
     private int delay = 0;
 
@@ -45,8 +45,6 @@ public class SetTimer extends Action {
         return automationControl.getOwnModuleConfig().getName() + ".timer." + timerParameterDefinition.getName();
     }
 
-    @Basic
-    @Column(name = "name", nullable = false)
     public String getName() {
         return timerParameterDefinition.getName();
     }
@@ -63,7 +61,9 @@ public class SetTimer extends Action {
         this.delay = delay;
     }
 
-    private class TimerParameterDefinition extends ParameterDefinition<Long> {
+    @Embeddable
+    public class TimerParameterDefinition extends ParameterDefinition<Long> {
+        @Column(name = "name", nullable = false)
         private String timerName = "Unnamed";
 
         public TimerParameterDefinition() {

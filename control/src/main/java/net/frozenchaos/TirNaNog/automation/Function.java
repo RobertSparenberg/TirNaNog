@@ -15,7 +15,6 @@ public class Function {
     @Id
     @Column(name = "name", nullable = false)
     private String name = "New Automation Function";
-    @Basic
     @Column(name = "active", nullable = false)
     private boolean active = false;
 

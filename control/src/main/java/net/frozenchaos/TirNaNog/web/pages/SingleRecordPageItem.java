@@ -1,15 +1,16 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "page_item_record")
 @DiscriminatorValue(value = "record")
 public class SingleRecordPageItem extends PageItem {
-    @Basic
     @Column(name = "record_name", nullable = false)
     private String recordName = "";
-    @Basic
     @Column(name = "values_to_display", nullable = false)
     private String valuesToDisplay = "";
 

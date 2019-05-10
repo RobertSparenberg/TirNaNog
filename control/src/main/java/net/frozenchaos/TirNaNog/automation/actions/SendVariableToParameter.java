@@ -4,16 +4,17 @@ import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.automation.Function;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "action_parameter_variable")
 @DiscriminatorValue(value = "sendVariableToParameter")
 public class SendVariableToParameter extends Action {
-    @Basic
     @Column(name = "parameter_qualifier", nullable = false)
     private String parameterQualifier = "";
-    @Basic
     @Column(name = "variable_name", nullable = false)
     private String variableName = "";
 

@@ -10,10 +10,8 @@ public class Record {
     @GeneratedValue
     @Column(name = "id", nullable = false)
     private long id;
-    @Basic
     @Column(name = "name", nullable = false)
     private String name;
-    @Basic
     @Column(name = "timestamp", nullable = false)
     private long timestamp;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)

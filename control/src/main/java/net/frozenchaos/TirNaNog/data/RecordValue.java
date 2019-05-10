@@ -11,7 +11,6 @@ public abstract class RecordValue {
     @GeneratedValue
     @Column(name = "id", nullable = false)
     private int id;
-    @Basic
     @Column(name = "timestamp", nullable = false)
     private long timestamp = -1;
 

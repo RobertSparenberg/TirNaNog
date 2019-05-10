@@ -2,7 +2,10 @@ package net.frozenchaos.TirNaNog.data;
 
 import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
@@ -15,10 +18,8 @@ public class ModuleConfig implements Serializable {
     @Id
     @Column(name = "name", nullable = false)
     private String name;
-    @Basic
     @Column(name = "ip", nullable = false)
     private String ip;
-    @Basic
     @Column(name = "last_message_timestamp")
     private long lastMessageTimestamp;
     private boolean hardwareInterfaceOnly;

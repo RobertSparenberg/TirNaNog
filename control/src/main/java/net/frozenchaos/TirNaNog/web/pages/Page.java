@@ -9,7 +9,6 @@ public class Page {
     @Id
     @Column(name = "name", nullable = false)
     private String name;
-    @Basic
     @Column(name = "order", nullable = false, unique = true)
     private int order;
     @OneToMany

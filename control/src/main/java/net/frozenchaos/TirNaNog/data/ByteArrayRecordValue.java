@@ -1,6 +1,13 @@
 package net.frozenchaos.TirNaNog.data;
 
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+
+@Entity
+@DiscriminatorValue(value = "Bytes")
 public class ByteArrayRecordValue extends RecordValue {
+    @Column(name = "value", nullable = false)
     private byte[] value;
 
     public ByteArrayRecordValue() {

@@ -1,12 +1,14 @@
 package net.frozenchaos.TirNaNog.web.pages;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "page_item_parameter")
 @DiscriminatorValue(value = "parameter")
 public class ParameterPageItem extends PageItem {
-    @Basic
     @Column(name = "parameter_qualifier", nullable = false)
     private String parameterQualifier = "";
 

@@ -5,13 +5,15 @@ import net.frozenchaos.TirNaNog.automation.Function;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.data.Record;
 
-import javax.persistence.*;
+import javax.persistence.Column;
+import javax.persistence.DiscriminatorValue;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "action_record_open")
 @DiscriminatorValue(value = "openRecord")
 public class OpenRecord extends Action {
-    @Basic
     @Column(name = "record_name")
     private String name = "Unnamed Record";
 
