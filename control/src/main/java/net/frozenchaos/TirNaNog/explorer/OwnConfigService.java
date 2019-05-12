@@ -1,13 +1,10 @@
 package net.frozenchaos.TirNaNog.explorer;
 
 import net.frozenchaos.TirNaNog.TirNaNogProperties;
-import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
 import net.frozenchaos.TirNaNog.capabilities.OwnCapabilityApplicationsService;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class OwnConfigService {
@@ -25,11 +22,7 @@ public class OwnConfigService {
     }
 
     public ModuleConfig getOwnConfig() {
-        List<CapabilityApplication> capabilityApplicationsList = capabilityApplicationsService.getCapabilityApplications();
-        CapabilityApplication capabilityApplications[] = new CapabilityApplication[capabilityApplicationsList.size()];
-        capabilityApplicationsList.toArray(capabilityApplications);
-
-        ownConfig.setCapabilityApplications(capabilityApplications);
+        ownConfig.setCapabilityApplications(capabilityApplicationsService.getCapabilityApplications());
         return ownConfig;
     }
 }

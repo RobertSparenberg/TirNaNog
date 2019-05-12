@@ -3,6 +3,7 @@ package net.frozenchaos.TirNaNog.explorer;
 import net.frozenchaos.TirNaNog.automation.AutomationControl;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
+import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.slf4j.Logger;
@@ -34,6 +35,7 @@ public class NotificationService {
     private static final int NOTIFICATION_PORT = 42002;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
+    private final ModuleConfigRepository moduleConfigRepository;
     private final AutomationControl automationControl;
     private final ServerSocket notificationServerSocket;
     private final String ownName;
@@ -42,11 +44,11 @@ public class NotificationService {
 
     private final ConcurrentHashMap<String, Long> parameterTimestamps = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, List<String>> parameterRegistrations = new ConcurrentHashMap<>();
-    private final ConcurrentHashMap<String, ModuleConfig> moduleListings = new ConcurrentHashMap<>();
 
     private boolean stopRequested = false;
 
-    public NotificationService(OwnConfigService ownConfigService, AutomationControl automationControl, Timer timer) throws IOException {
+    public NotificationService(OwnConfigService ownConfigService, ModuleConfigRepository moduleConfigRepository, AutomationControl automationControl, Timer timer) throws IOException {
+        this.moduleConfigRepository = moduleConfigRepository;
         logger.trace("NotificationService Initializing");
         this.automationControl = automationControl;
         this.timer = timer;
@@ -91,29 +93,38 @@ public class NotificationService {
         parameterToSend.setTimestamp(timer.getTime());
         parameterTimestamps.put(parameterToSend.getQualifier(), parameterToSend.getTimestamp());
         for(String destinationName : parameterRegistrations.get(parameterToSend.getQualifier())) {
-            ModuleConfig destination = moduleListings.get(destinationName);
+            ModuleConfig destination = moduleConfigRepository.findByName(destinationName);
             if(destination != null) {
                 timer.addTask(new ParameterSendTask(parameterToSend, destination));
+            } else {
+                removeUnrespondingModule(destination);
             }
         }
     }
 
     public void onLocalParameter(String capabilityName, Parameter parameter) {
-        automationControl.onParameter(ownName + '.' + capabilityName + '.' + parameter.getName(), parameter);
+        automationControl.onParameter(ownName+'.'+capabilityName+'.'+parameter.getName(), parameter);
     }
 
     public void onModuleDiscovery(ModuleConfig moduleConfig) {
-        //todo: right now modules can register for parameters, but they're never cleaned up.. add cleanup
-        moduleListings.put(moduleConfig.getName(), moduleConfig);
         for(String parameter : moduleConfig.getSubscribedParameters()) {
             if(parameter.startsWith(ownName)) {
                 if(!parameterRegistrations.containsKey(parameter)) {
                     parameterRegistrations.put(parameter, new CopyOnWriteArrayList<>());
                 }
-                List<String> parameterRegistrations = this.parameterRegistrations.get(parameter);
-                if(!parameterRegistrations.contains(moduleConfig.getName())) {
-                    parameterRegistrations.add(moduleConfig.getName());
+                List<String> registeredModules = parameterRegistrations.get(parameter);
+                if(!registeredModules.contains(moduleConfig.getName())) {
+                    registeredModules.add(moduleConfig.getName());
                 }
+            }
+        }
+    }
+
+    private void removeUnrespondingModule(ModuleConfig moduleConfig) {
+        for(String parameter : moduleConfig.getSubscribedParameters()) {
+            List<String> registeredModules = parameterRegistrations.get(parameter);
+            if(registeredModules != null) {
+                registeredModules.remove(moduleConfig.getName());
             }
         }
     }

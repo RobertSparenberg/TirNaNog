@@ -2,32 +2,19 @@ package net.frozenchaos.TirNaNog.data;
 
 import net.frozenchaos.TirNaNog.capabilities.CapabilityApplication;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.List;
 
 @XmlRootElement
-@Entity
-@Table(name = "module_config")
 public class ModuleConfig implements Serializable {
-    @Id
-    @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "ip", nullable = false)
     private String ip;
-    @Column(name = "last_message_timestamp")
     private long lastMessageTimestamp;
     private boolean hardwareInterfaceOnly;
     private List<CapabilityApplication> capabilityApplications;
     private List<String> subscribedParameters;
-
-    public ModuleConfig() {
-    }
 
     public ModuleConfig(String name, String ip, boolean hardwareInterfaceOnly) {
         this.name = name;

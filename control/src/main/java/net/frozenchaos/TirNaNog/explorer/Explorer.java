@@ -1,6 +1,8 @@
 package net.frozenchaos.TirNaNog.explorer;
 
 import net.frozenchaos.TirNaNog.TirNaNogProperties;
+import net.frozenchaos.TirNaNog.automation.triggers.TriggerRepository;
+import net.frozenchaos.TirNaNog.capabilities.OwnCapabilityApplicationsService;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.slf4j.Logger;
@@ -22,18 +24,29 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
 
     private final ModuleConfigRepository moduleConfigRepository;
     private final OwnConfigService ownConfigService;
+    private final OwnCapabilityApplicationsService ownCapabilityApplicationsService;
+    private final TriggerRepository triggerRepository;
+    private final NotificationService notificationService;
     private final Timer timer;
     private final Properties properties;
 
     private Broadcaster broadcaster;
-//    private Telephone telephone;
     private boolean started = false;
 
 
     @Autowired
-    public Explorer(ModuleConfigRepository moduleConfigRepository, OwnConfigService ownConfigService, Timer timer, TirNaNogProperties properties) {
+    public Explorer(ModuleConfigRepository moduleConfigRepository,
+                    OwnConfigService ownConfigService,
+                    OwnCapabilityApplicationsService ownCapabilityApplicationsService,
+                    TriggerRepository triggerRepository,
+                    NotificationService notificationService,
+                    Timer timer,
+                    TirNaNogProperties properties) {
         this.moduleConfigRepository = moduleConfigRepository;
         this.ownConfigService = ownConfigService;
+        this.ownCapabilityApplicationsService = ownCapabilityApplicationsService;
+        this.triggerRepository = triggerRepository;
+        this.notificationService = notificationService;
         this.timer = timer;
         this.properties = properties;
     }
@@ -43,7 +56,7 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
         if(!this.started) {
             logger.info("Initializing TirNaNog device explorer");
             try {
-                broadcaster = new Broadcaster(moduleConfigRepository, ownConfigService, timer, properties);
+                broadcaster = new Broadcaster(moduleConfigRepository, ownConfigService, ownCapabilityApplicationsService, triggerRepository, notificationService, timer, properties);
                 started = true;
                 logger.info("TirNaNog device explorer initialized");
             } catch(Exception e) {
