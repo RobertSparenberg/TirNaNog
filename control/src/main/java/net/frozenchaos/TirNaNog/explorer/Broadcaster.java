@@ -36,7 +36,6 @@ public class Broadcaster {
     private final OwnConfigService ownConfigService;
     private final OwnCapabilityApplicationsService ownCapabilityApplicationsService;
     private final TriggerRepository triggerRepository;
-    private final NotificationService notificationService;
 
     private final DatagramSocket broadcastSocket;
     private final DatagramSocket listenSocket;
@@ -51,7 +50,6 @@ public class Broadcaster {
                        OwnConfigService ownConfigService,
                        OwnCapabilityApplicationsService ownCapabilityApplicationsService,
                        TriggerRepository triggerRepository,
-                       NotificationService notificationService,
                        Timer timer,
                        Properties properties) throws IOException, JAXBException {
         this.ownConfigService = ownConfigService;
@@ -60,7 +58,6 @@ public class Broadcaster {
         ownModuleName = ownConfigService.getOwnConfig().getName();
         logger.trace("Broadcaster initializing");
         this.moduleConfigRepository = moduleConfigRepository;
-        this.notificationService = notificationService;
 
         broadcastSocket = new DatagramSocket();
         broadcastSocket.setBroadcast(true);
@@ -108,7 +105,6 @@ public class Broadcaster {
                         moduleConfig.setIp(receivedBroadcast.getAddress().getHostAddress());
                         logger.trace("Broadcaster saving moduleconfig: "+moduleConfig.toString());
                         moduleConfigRepository.save(moduleConfig);
-                        notificationService.onModuleDiscovery(moduleConfig);
                     }
                 }
             } catch(Exception e) {

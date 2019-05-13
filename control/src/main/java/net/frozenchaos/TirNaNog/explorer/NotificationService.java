@@ -1,8 +1,9 @@
 package net.frozenchaos.TirNaNog.explorer;
 
-import net.frozenchaos.TirNaNog.automation.AutomationControl;
+import net.frozenchaos.TirNaNog.automation.ParameterListener;
 import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
+import net.frozenchaos.TirNaNog.data.ModuleConfigEventListener;
 import net.frozenchaos.TirNaNog.data.ModuleConfigRepository;
 import net.frozenchaos.TirNaNog.utils.ScheduledTask;
 import net.frozenchaos.TirNaNog.utils.Timer;
@@ -17,6 +18,7 @@ import java.io.InputStreamReader;
 import java.io.StringReader;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -28,7 +30,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * It will receive subscribed parameters and send parameters to other modules if they subscribed to it.
  */
 @Service
-public class NotificationService {
+public class NotificationService implements ModuleConfigEventListener {
     private static final int SOCKET_TIMEOUT = 5000;
     private static final int DELAY_BETWEEN_NOTIFICATIONS = 2000;
     private static final int RETRY_ATTEMPTS = 3;
@@ -36,7 +38,7 @@ public class NotificationService {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
     private final ModuleConfigRepository moduleConfigRepository;
-    private final AutomationControl automationControl;
+    private final List<ParameterListener> listeners = new ArrayList<>();
     private final ServerSocket notificationServerSocket;
     private final String ownName;
     private final Thread exchangeListenThread;
@@ -47,10 +49,9 @@ public class NotificationService {
 
     private boolean stopRequested = false;
 
-    public NotificationService(OwnConfigService ownConfigService, ModuleConfigRepository moduleConfigRepository, AutomationControl automationControl, Timer timer) throws IOException {
+    public NotificationService(OwnConfigService ownConfigService, ModuleConfigRepository moduleConfigRepository, Timer timer) throws IOException {
         this.moduleConfigRepository = moduleConfigRepository;
         logger.trace("NotificationService Initializing");
-        this.automationControl = automationControl;
         this.timer = timer;
         notificationServerSocket = new ServerSocket(NOTIFICATION_PORT);
 
@@ -80,7 +81,9 @@ public class NotificationService {
                 Parameter parameter = JAXB.unmarshal(new StringReader(stringBuilder.toString()), Parameter.class);
                 logger.trace("Received notification xml: " + stringBuilder.toString());
                 if(!ownName.equals(parameter.getName())) {
-                    automationControl.onParameter(parameter.getQualifier(), parameter);
+                    for(ParameterListener listener : listeners) {
+                        listener.onParameter(parameter.getQualifier(), parameter);
+                    }
                 }
             } catch(Exception e) {
                 logger.error("Error processing incoming notification", e);
@@ -96,17 +99,19 @@ public class NotificationService {
             ModuleConfig destination = moduleConfigRepository.findByName(destinationName);
             if(destination != null) {
                 timer.addTask(new ParameterSendTask(parameterToSend, destination));
-            } else {
-                removeUnrespondingModule(destination);
             }
         }
     }
 
     public void onLocalParameter(String capabilityName, Parameter parameter) {
-        automationControl.onParameter(ownName+'.'+capabilityName+'.'+parameter.getName(), parameter);
+        String qualifier = ownName + '.' + capabilityName + '.' + parameter.getName();
+        for(ParameterListener listener : listeners) {
+            listener.onParameter(qualifier, parameter);
+        }
     }
 
-    public void onModuleDiscovery(ModuleConfig moduleConfig) {
+    @Override
+    public void onModuleConfigSave(ModuleConfig moduleConfig) {
         for(String parameter : moduleConfig.getSubscribedParameters()) {
             if(parameter.startsWith(ownName)) {
                 if(!parameterRegistrations.containsKey(parameter)) {
@@ -120,7 +125,8 @@ public class NotificationService {
         }
     }
 
-    private void removeUnrespondingModule(ModuleConfig moduleConfig) {
+    @Override
+    public void onModuleConfigRemove(ModuleConfig moduleConfig) {
         for(String parameter : moduleConfig.getSubscribedParameters()) {
             List<String> registeredModules = parameterRegistrations.get(parameter);
             if(registeredModules != null) {
@@ -139,6 +145,10 @@ public class NotificationService {
             exchangeListenThread.join(SOCKET_TIMEOUT+1000);
         } catch(Exception ignored) {
         }
+    }
+
+    public void addListener(ParameterListener listener) {
+        listeners.add(listener);
     }
 
     /**

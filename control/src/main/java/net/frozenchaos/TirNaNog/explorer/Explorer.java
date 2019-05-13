@@ -26,7 +26,6 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
     private final OwnConfigService ownConfigService;
     private final OwnCapabilityApplicationsService ownCapabilityApplicationsService;
     private final TriggerRepository triggerRepository;
-    private final NotificationService notificationService;
     private final Timer timer;
     private final Properties properties;
 
@@ -39,14 +38,12 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
                     OwnConfigService ownConfigService,
                     OwnCapabilityApplicationsService ownCapabilityApplicationsService,
                     TriggerRepository triggerRepository,
-                    NotificationService notificationService,
                     Timer timer,
                     TirNaNogProperties properties) {
         this.moduleConfigRepository = moduleConfigRepository;
         this.ownConfigService = ownConfigService;
         this.ownCapabilityApplicationsService = ownCapabilityApplicationsService;
         this.triggerRepository = triggerRepository;
-        this.notificationService = notificationService;
         this.timer = timer;
         this.properties = properties;
     }
@@ -56,7 +53,7 @@ public class Explorer implements ApplicationListener<ContextRefreshedEvent> {
         if(!this.started) {
             logger.info("Initializing TirNaNog device explorer");
             try {
-                broadcaster = new Broadcaster(moduleConfigRepository, ownConfigService, ownCapabilityApplicationsService, triggerRepository, notificationService, timer, properties);
+                broadcaster = new Broadcaster(moduleConfigRepository, ownConfigService, ownCapabilityApplicationsService, triggerRepository, timer, properties);
                 started = true;
                 logger.info("TirNaNog device explorer initialized");
             } catch(Exception e) {

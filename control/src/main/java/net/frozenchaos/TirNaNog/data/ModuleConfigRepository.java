@@ -4,6 +4,8 @@ import net.frozenchaos.TirNaNog.TirNaNogProperties;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -11,6 +13,7 @@ import java.util.concurrent.ConcurrentHashMap;
 public class ModuleConfigRepository {
     private static final int MODULE_KEEP_CACHED_TIME = 200000;
     private static final String MODULE_KEEP_CACHED_TIME_PROPERTY = "net.frozenchaos.TirNaNog.keep_modules_cached_time";
+    private final List<ModuleConfigEventListener> listeners = new ArrayList<>();
 
     private final Timer timer;
 
@@ -27,6 +30,10 @@ public class ModuleConfigRepository {
         }
     }
 
+    public void addListener(ModuleConfigEventListener listener) {
+        listeners.add(listener);
+    }
+
     public ModuleConfig findByName(String name) {
         ModuleConfig moduleConfig = configs.get(name);
         if(moduleConfig != null) {
@@ -41,9 +48,15 @@ public class ModuleConfigRepository {
 
     public void save(ModuleConfig moduleConfig) {
         configs.put(moduleConfig.getName(), moduleConfig);
+        for(ModuleConfigEventListener listener : listeners) {
+            listener.onModuleConfigSave(moduleConfig);
+        }
     }
 
     public void remove(ModuleConfig moduleConfig) {
         configs.remove(moduleConfig.getName());
+        for(ModuleConfigEventListener listener : listeners) {
+            listener.onModuleConfigRemove(moduleConfig);
+        }
     }
 }

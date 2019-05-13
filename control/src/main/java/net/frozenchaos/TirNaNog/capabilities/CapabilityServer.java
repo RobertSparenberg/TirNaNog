@@ -1,6 +1,6 @@
 package net.frozenchaos.TirNaNog.capabilities;
 
-import net.frozenchaos.TirNaNog.automation.AutomationControl;
+import net.frozenchaos.TirNaNog.explorer.NotificationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -16,7 +16,7 @@ public class CapabilityServer {
     private static final long CAPABILITY_SHUTDOWN_TIMEOUT = 2000;
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    private final AutomationControl automationControl;
+    private final NotificationService notificationService;
     private final OwnCapabilityApplicationsService capabilityApplicationsService;
     private final Thread acceptConnectionsThread;
     private ServerSocket serverSocket;
@@ -24,10 +24,10 @@ public class CapabilityServer {
     private boolean stopRequested = false;
 
     @Autowired
-    public CapabilityServer(AutomationControl automationControl, OwnCapabilityApplicationsService capabilityApplicationsService) {
+    public CapabilityServer(NotificationService notificationService, OwnCapabilityApplicationsService capabilityApplicationsService) {
+        this.notificationService = notificationService;
         this.capabilityApplicationsService = capabilityApplicationsService;
         logger.info("Capability Server initializing");
-        this.automationControl = automationControl;
         this.acceptConnectionsThread = new Thread(this::acceptConnections);
         this.acceptConnectionsThread.start();
         Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
@@ -61,7 +61,7 @@ public class CapabilityServer {
     private void startCapabilityThread(Socket capabilitySocket) {
         CapabilityThread capabilityThread;
         if(!stopRequested) {
-            capabilityThread = new CapabilityThread(capabilitySocket, capabilityApplicationsService, automationControl);
+            capabilityThread = new CapabilityThread(capabilitySocket, capabilityApplicationsService, notificationService);
             capabilityApplicationsService.addCapabilityApplication(capabilityThread);
             capabilityThread.start();
         }

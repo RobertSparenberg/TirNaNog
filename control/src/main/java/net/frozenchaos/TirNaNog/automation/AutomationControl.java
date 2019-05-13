@@ -5,13 +5,14 @@ import net.frozenchaos.TirNaNog.data.FunctionRepository;
 import net.frozenchaos.TirNaNog.data.ModuleConfig;
 import net.frozenchaos.TirNaNog.data.RecordRepository;
 import net.frozenchaos.TirNaNog.explorer.Explorer;
+import net.frozenchaos.TirNaNog.explorer.NotificationService;
 import net.frozenchaos.TirNaNog.explorer.OwnConfigService;
 import net.frozenchaos.TirNaNog.utils.Timer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class AutomationControl {
+public class AutomationControl implements ParameterListener {
     private final FunctionRepository functionRepository;
     private final RecordRepository recordRepository;
     private final OwnConfigService ownConfigService;
@@ -23,6 +24,7 @@ public class AutomationControl {
     public AutomationControl(FunctionRepository functionRepository,
                              RecordRepository recordRepository,
                              OwnConfigService ownConfigService,
+                             NotificationService notificationService,
                              Timer timer,
                              Explorer explorer) {
         this.functionRepository = functionRepository;
@@ -30,13 +32,15 @@ public class AutomationControl {
         this.ownConfigService = ownConfigService;
         this.timer = timer;
         this.explorer = explorer;
+        notificationService.addListener(this);
 
         functions = functionRepository.findAll();
     }
 
-    public void onParameter(String namespace, Parameter parameter) {
+    @Override
+    public void onParameter(String parameterQualifier, Parameter parameter) {
         for(Function function : functions) {
-            function.onParameter(namespace, parameter, this);
+            function.onParameter(parameterQualifier, parameter, this);
         }
     }
 
