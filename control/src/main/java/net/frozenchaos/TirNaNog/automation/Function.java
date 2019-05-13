@@ -22,8 +22,7 @@ public class Function {
     private List<Rule> rules = new ArrayList<>();
     @Transient
     private Map<String, Object> variables = new HashMap<>();
-    @OneToMany
-    @MapKey(name = "variable_name")
+    @OneToOne
     private Record record = null;
 
     public void onParameter(String namespace, Parameter parameter, AutomationControl automationControl) {

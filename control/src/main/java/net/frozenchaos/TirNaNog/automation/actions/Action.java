@@ -9,7 +9,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "action")
 @DiscriminatorColumn(name = "action_type")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+//@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Action {
     @Id
     @GeneratedValue

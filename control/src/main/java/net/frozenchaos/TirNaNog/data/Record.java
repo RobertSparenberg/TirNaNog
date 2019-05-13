@@ -15,7 +15,7 @@ public class Record {
     @Column(name = "timestamp", nullable = false)
     private long timestamp;
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
-    @MapKey(name = "variable_name")
+    @MapKey(name = "valueName")
     private Map<String, RecordValue> values;
 
     public void setValue(String name, Object variable) {

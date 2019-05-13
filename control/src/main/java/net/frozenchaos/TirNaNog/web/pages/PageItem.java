@@ -14,7 +14,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "page_item")
 @DiscriminatorColumn(name = "page_item_type", discriminatorType = DiscriminatorType.STRING)
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+//@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class PageItem {
     @Id
     @GeneratedValue

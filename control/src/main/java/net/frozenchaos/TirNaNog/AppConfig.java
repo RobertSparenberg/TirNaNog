@@ -1,21 +1,27 @@
 package net.frozenchaos.TirNaNog;
 
-//@Configuration
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import java.io.FileInputStream;
+import java.io.IOException;
+
+@Configuration
 public class AppConfig {
 //    private static final java.lang.String DB_USERNAME = "net.frozenchaos.TirNaNog.db.username";
 //    private static final java.lang.String DB_PASSWORD = "net.frozenchaos.TirNaNog.db.password";
 //    private static final java.lang.String DB_PORT = "net.frozenchaos.TirNaNog.db.port";
-//    private final TirNaNogProperties properties;
+    private final TirNaNogProperties properties;
 //
-//    public AppConfig() throws IOException {
-//        this.properties = new TirNaNogProperties();
-//        properties.load(new FileInputStream("application.properties"));
-//    }
-//
-//    @Bean
-//    public TirNaNogProperties tirNaNogProperties() {
-//        return properties;
-//    }
+    public AppConfig() throws IOException {
+        this.properties = new TirNaNogProperties();
+        properties.load(new FileInputStream("application.properties"));
+    }
+
+    @Bean
+    public TirNaNogProperties tirNaNogProperties() {
+        return properties;
+    }
 //
 //    @Bean
 //    public DataSource customDataSource() {

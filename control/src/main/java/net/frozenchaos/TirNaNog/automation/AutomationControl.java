@@ -18,7 +18,6 @@ public class AutomationControl implements ParameterListener {
     private final OwnConfigService ownConfigService;
     private final Timer timer;
     private final Explorer explorer;
-    private Iterable<Function> functions;
 
     @Autowired
     public AutomationControl(FunctionRepository functionRepository,
@@ -33,13 +32,11 @@ public class AutomationControl implements ParameterListener {
         this.timer = timer;
         this.explorer = explorer;
         notificationService.addListener(this);
-
-        functions = functionRepository.findAll();
     }
 
     @Override
     public void onParameter(String parameterQualifier, Parameter parameter) {
-        for(Function function : functions) {
+        for(Function function : functionRepository.findAll()) {
             function.onParameter(parameterQualifier, parameter, this);
         }
     }

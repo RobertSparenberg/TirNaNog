@@ -7,7 +7,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "trigger")
 @DiscriminatorColumn(name = "trigger_type")
-@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
+//@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Trigger {
     @Id
     @GeneratedValue
