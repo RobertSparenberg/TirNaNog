@@ -64,6 +64,7 @@ public class NotificationService implements ModuleConfigEventListener {
                 receiveNotifications();
             }
         };
+        Runtime.getRuntime().addShutdownHook(new Thread(this::shutdown));
         exchangeListenThread.start();
         logger.trace("NotificationService initialized");
     }
@@ -135,8 +136,9 @@ public class NotificationService implements ModuleConfigEventListener {
         }
     }
 
-    public void destroyGracefully() {
+    public void shutdown() {
         this.stopRequested = true;
+        logger.debug("Shutting down notification service");
         try {
             notificationServerSocket.close();
         } catch(Exception ignored) {
