@@ -9,8 +9,8 @@ public class Page {
     @Id
     @Column(name = "name", nullable = false)
     private String name;
-    @Column(name = "order", nullable = false, unique = true)
-    private int order;
+    @Column(name = "pageOrder", nullable = false, unique = true)
+    private int pageOrder;
     @OneToMany
     private List<PageRow> rows;
 
@@ -29,12 +29,12 @@ public class Page {
         this.name = name;
     }
 
-    public int getOrder() {
-        return order;
+    public int getPageOrder() {
+        return pageOrder;
     }
 
-    public void setOrder(int order) {
-        this.order = order;
+    public void setPageOrder(int pageOrder) {
+        this.pageOrder = pageOrder;
     }
 
     public List<PageRow> getRows() {

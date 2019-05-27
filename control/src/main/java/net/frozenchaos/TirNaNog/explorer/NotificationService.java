@@ -87,7 +87,9 @@ public class NotificationService implements ModuleConfigEventListener {
                     }
                 }
             } catch(Exception e) {
-                logger.error("Error processing incoming notification", e);
+                if(!stopRequested) {
+                    logger.error("Error processing incoming notification", e);
+                }
             }
         }
     }

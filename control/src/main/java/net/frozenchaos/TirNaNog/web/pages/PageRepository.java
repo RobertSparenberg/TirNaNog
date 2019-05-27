@@ -9,6 +9,6 @@ public interface PageRepository extends CrudRepository<Page, Integer> {
     @Query("SELECT page FROM Page page WHERE page.name = ?1")
     Page findByName(String pageName);
 
-    @Query("SELECT page FROM Page page ORDER BY page.order")
+    @Query("SELECT page FROM Page page ORDER BY page.pageOrder")
     List<Page> getPagesOrdered();
 }

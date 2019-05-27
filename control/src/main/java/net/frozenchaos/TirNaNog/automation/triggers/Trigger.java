@@ -5,7 +5,7 @@ import net.frozenchaos.TirNaNog.capabilities.parameters.Parameter;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "trigger")
+@Table(name = "function_rule_trigger")
 @DiscriminatorColumn(name = "trigger_type")
 //@Inheritance(strategy = InheritanceType.TABLE_PER_CLASS)
 public abstract class Trigger {

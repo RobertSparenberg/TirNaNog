@@ -23,6 +23,9 @@ public class ModuleConfig implements Serializable {
         this.lastMessageTimestamp = -1;
     }
 
+    public ModuleConfig() {
+    }
+
     @XmlElement(name="name")
     public String getName() {
         return name;

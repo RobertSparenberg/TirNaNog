@@ -52,7 +52,7 @@ public class AdminPageRestController {
             if(page == null) {
                 page = new Page(pageName);
             }
-            page.setOrder(newPageList.size() + 1);
+            page.setPageOrder(newPageList.size()+1);
             newPageList.add(page);
         }
         for(Page existingPage : existingPages) {
@@ -66,7 +66,7 @@ public class AdminPageRestController {
     @RequestMapping(value = "/pages/page/views/view/{pageName}", method = RequestMethod.POST)
     public void savePage(@RequestBody Page page, @PathVariable String pageName) {
         Page originalPage = pageRepository.findByName(pageName.replace('_', ' '));
-        page.setOrder(originalPage.getOrder());
+        page.setPageOrder(originalPage.getPageOrder());
         pageRepository.delete(originalPage);
         try {
             Page savedPage = pageRepository.save(page);
