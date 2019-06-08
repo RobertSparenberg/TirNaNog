@@ -27,7 +27,7 @@ import java.util.Properties;
  * Each other module is responsible for ringing this module with the Telephone class to let us know where it is and that it heard our broadcast.
  */
 public class Broadcaster {
-    private static final int BROADCAST_PORT = 42001;
+    static final int BROADCAST_PORT = 42001;
     private static final String REBROADCAST_DELAY_PROPERTY = "net.frozenchaos.TirNaNog.broadcast_delay";
     private final int REBROADCAST_DELAY = 41000;
 

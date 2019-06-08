@@ -27,6 +27,11 @@ public class CatCoop extends TirNaNogCapabilityBase {
     }
 
     @Override
+    protected String getName() {
+        return "CatCoop";
+    }
+
+    @Override
     protected List<Capability> getCapabilities() {
         List<Capability> capabilities = new ArrayList<>();
         capabilities.add(createCapability("Door", doorInputParameterDefinition));

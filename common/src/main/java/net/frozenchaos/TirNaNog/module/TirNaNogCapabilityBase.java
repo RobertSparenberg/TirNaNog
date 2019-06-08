@@ -8,14 +8,13 @@ import org.reflections.Reflections;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXB;
-import java.io.File;
 import java.lang.reflect.Modifier;
 import java.util.List;
 
+//todo: cleanup
 public abstract class TirNaNogCapabilityBase {
     protected static final Logger logger = LoggerFactory.getLogger(TirNaNogCapabilityBase.class);
-    private TirNaNogCapabilityConfiguration configuration = null;
+//    private TirNaNogCapabilityConfiguration configuration = null;
     private CapabilityApplication capabilityApplication = null;
 
     public static void main(String args[]) throws Exception {
@@ -39,10 +38,11 @@ public abstract class TirNaNogCapabilityBase {
     }
 
     private void init() throws Exception {
-        configuration = JAXB.unmarshal(new File("capabilityconfig.xml"), TirNaNogCapabilityConfiguration.class);
-        logger.info("Initializing " + configuration.getName());
+//        configuration = JAXB.unmarshal(new File("capabilityconfig.xml"), TirNaNogCapabilityConfiguration.class);
+        String name = getName();
+        logger.info("Initializing " + name);
 
-        capabilityApplication = new CapabilityApplication(configuration.getName(), getCapabilities());
+        capabilityApplication = new CapabilityApplication(name, getCapabilities());
         CapabilityClient capabilityClient = new CapabilityClient(capabilityApplication, getParameterProcessors());
 
         Runtime.getRuntime().addShutdownHook(new Thread() {
@@ -57,9 +57,11 @@ public abstract class TirNaNogCapabilityBase {
         capabilityClient.run();
     }
 
-    protected TirNaNogCapabilityConfiguration getConfiguration() {
-        return configuration;
-    }
+//    protected TirNaNogCapabilityConfiguration getConfiguration() {
+//        return configuration;
+//    }
+
+    protected abstract String getName();
 
     protected abstract List<Capability> getCapabilities();
 
