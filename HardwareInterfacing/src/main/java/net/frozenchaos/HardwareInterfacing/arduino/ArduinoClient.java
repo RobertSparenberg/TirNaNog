@@ -27,7 +27,7 @@ public class ArduinoClient {
     private boolean acceptRequested = false;
     private boolean acceptedReceived = false;
     private boolean configured = false;
-    private long messageCounter = 0;
+    private int messageCounter = 0; //java int is the same size as arduino long
 
     public ArduinoClient(SerialPort port, List<PinDefinition> pins) {
         this.port = port;
@@ -108,6 +108,7 @@ public class ArduinoClient {
 
         long messageId;
         String acceptedReply;
+
         for(PinDefinition pin : pins) {
             messageId = messageCounter++;
             acceptedReply = messageId + MESSAGE_SEPARATOR + "OK";
@@ -139,19 +140,7 @@ public class ArduinoClient {
                 }
             }
         }
-        //final 'config done' message to get the all clear
-        messageId = messageCounter++;
-        acceptedReply = messageId + MESSAGE_SEPARATOR + "DONE";
-        String message = messageId + MESSAGE_SEPARATOR
-                + MessageType.CONFIG.toString() + MESSAGE_SEPARATOR
-                + "DONE" + MESSAGE_END;
-        while(true) {
-            sendMessage(outputStream, message);
-            if(acceptedReply.equals(receiveMessage(inputStream))) {
-                configured = true;
-                break;
-            }
-        }
+        configured = true;
     }
 
     private boolean sendMessage(OutputStream outputStream, String message) {
