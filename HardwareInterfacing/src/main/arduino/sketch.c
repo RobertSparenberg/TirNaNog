@@ -21,9 +21,6 @@ const char CONFIG_DONE[] = "DONE";
 const int HANDSHAKE_INIT_BROADCAST_DELAY = 1000;
 int delayUntilHandshakeBroadcast = HANDSHAKE_INIT_BROADCAST_DELAY;
 
-bool configReady;
-bool configDone;
-
 unsigned long previousTimeMillis = 0;
 unsigned int delta = 0;
 char receivedMessage[64];
@@ -49,8 +46,7 @@ void loop() {
             acceptSync();
         }
     } else {
-        receiveConfig();
-        receiveCommands();
+        receiveMessage();
     }
 
     //set the flag to false; don't process a message more than once
@@ -76,10 +72,22 @@ void acceptSync() {
     }
 }
 
-void receiveConfig() {
+void receiveMessage() {
     if(messageReady) {
-        if(!configReady) {
+
+        char* idSeparator = strchr(receivedMessage, MESSAGE_SEPARATOR);
+        if(idSeparator != 0)
+        {
+            // Actually split the string in 2: replace ':' with 0
+            *separator = 0;
+            int servoId = atoi(command);
+            long receivedMessageId = ;
+            ++separator;
+            int position = atoi(separator);
         }
+        //get id, type to pass on to other func, and actual payload to pass on
+        //id logic
+
     }
 }
 
