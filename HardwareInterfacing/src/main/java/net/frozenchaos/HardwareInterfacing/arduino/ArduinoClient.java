@@ -13,10 +13,8 @@ import java.io.OutputStream;
 import java.util.List;
 
 public class ArduinoClient {
-    private static final String CONFIG_ACTUATOR_DEFIINITION = "ACT";
-    private static final String CONFIG_SENSOR_DEFIINITION = "SNS";
-    private static char MESSAGE_SEPARATOR = ':';
-    private static char MESSAGE_END = '\n';
+    private static final String MESSAGE_SEPARATOR = ":";
+    private static final char MESSAGE_END = '\n';
     private static final String HANDSHAKE_INIT = "TirNaNog Arduino Init" + MESSAGE_END;
     private static final String HANDSHAKE_ACCEPT = "TirNaNog Arduino Accept" + MESSAGE_END;
 
@@ -90,6 +88,14 @@ public class ArduinoClient {
         }
     }
 
+    /**
+     * config message definition:
+     * messageId
+     * messageType (0 = config, 1 = command)
+     * pinNumber
+     * pinType (0 = sensor, 1 = actuator)
+     * pinSignalType (0 = digital, 1 = pwm; pinType = actuator only)
+     **/
     private void configure() {
         if(pins == null) {
             return;
@@ -114,10 +120,9 @@ public class ArduinoClient {
             acceptedReply = messageId + MESSAGE_SEPARATOR + "OK";
             if(pin instanceof SensorPinDefinition) {
                 String configMessage = messageId + MESSAGE_SEPARATOR
-                        + MessageType.CONFIG.toString() + MESSAGE_SEPARATOR
+                        + MessageType.CONFIG.ordinal() + MESSAGE_SEPARATOR
                         + pin.getPinNumber() + MESSAGE_SEPARATOR
-                        + CONFIG_SENSOR_DEFIINITION + MESSAGE_SEPARATOR
-                        + ((SensorPinDefinition) pin).getValueMultiplier()
+                        + PIN_TYPE.SENSOR.ordinal() + MESSAGE_SEPARATOR
                         + MESSAGE_END;
                 while(true) {
                     sendMessage(outputStream, configMessage);
@@ -127,10 +132,9 @@ public class ArduinoClient {
                 }
             } else if(pin instanceof ActuatorPinDefinition) {
                 String configMessage = messageId + MESSAGE_SEPARATOR
-                       + MessageType.CONFIG.toString() + MESSAGE_SEPARATOR
+                       + MessageType.CONFIG.ordinal() + MESSAGE_SEPARATOR
                        + pin.getPinNumber() + MESSAGE_SEPARATOR
-                       + CONFIG_ACTUATOR_DEFIINITION + MESSAGE_SEPARATOR
-                       + ((ActuatorPinDefinition) pin).getPinSignalType().toString()
+                       + PIN_TYPE.ACTUATOR.ordinal() + MESSAGE_SEPARATOR
                        + MESSAGE_END;
                 while(true) {
                     sendMessage(outputStream, configMessage);
@@ -172,6 +176,12 @@ public class ArduinoClient {
     }
 
     private enum MessageType {
-        CONFIG, COMMAND
+        CONFIG,
+        COMMAND
+    }
+
+    private enum PIN_TYPE {
+        SENSOR,
+        ACTUATOR
     }
 }

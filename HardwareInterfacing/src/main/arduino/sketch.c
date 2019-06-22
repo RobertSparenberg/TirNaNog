@@ -23,11 +23,26 @@ int delayUntilHandshakeBroadcast = HANDSHAKE_INIT_BROADCAST_DELAY;
 
 unsigned long previousTimeMillis = 0;
 unsigned int delta = 0;
+
+// MESSAGING RELATED VARIABLES //
 char receivedMessage[64];
 char receivedChar;
+char* receivedMessageSeparator;
+char* receivedMessagePart;
+
+long receivedMessageId = -1;
+byte receivedMessageType;
+byte receivedPinNumber;
+byte receivedPinType;
+int receivedValue;
+byte receivedPinSignalType;
+
 byte receivedMessageIndex = 0;
 bool messageReady = false;
-long lastMessageId; //java int is the same size as arduino long
+long lastMessageId = -1; //java int is the same size as arduino long
+
+// OTHER VARIABLES //
+long readValue;
 
 
 void setup() {
@@ -72,22 +87,101 @@ void acceptSync() {
     }
 }
 
+
+/**
+ * base message definition:
+ * messageId
+ * messageType (0 = config, 1 = command)
+ * other values are type specific
+ **/
 void receiveMessage() {
     if(messageReady) {
+        receivedMessageId = strtol(receivedMessage, receivedMessagePart, 10);
+        if(receivedMessageId > lastMessageId) {
+            lastMessageId = receivedMessageId;
+            ++receivedMessagePart;
 
-        char* idSeparator = strchr(receivedMessage, MESSAGE_SEPARATOR);
-        if(idSeparator != 0)
-        {
-            // Actually split the string in 2: replace ':' with 0
-            *separator = 0;
-            int servoId = atoi(command);
-            long receivedMessageId = ;
-            ++separator;
-            int position = atoi(separator);
+            receivedMessageType = receivedMessagePart-1;
+            ++receivedMessagePart;
+            ++receivedMessagePart;
+
+            if(receivedMessageType == 0) {
+                receiveConfigMessage();
+            } else if(receivedMessageType == 1) {
+                receiveCommandMessage();
+            }
         }
-        //get id, type to pass on to other func, and actual payload to pass on
-        //id logic
+    }
+}
 
+/**
+ * config message definition (in addition to basic message definition):
+ * pinNumber
+ * pinType (0 = sensor, 1 = actuator)
+ **/
+void receiveConfigMessage() {
+    receivedPinNumber = receivedMessagePart-1;
+    ++receivedMessagePart;
+    ++receivedMessagePart;
+    receivedPinType = receivedMessagePart-1;
+
+    if(receivedPinType == 0) {
+        pinMode(receivedPinNumber, INPUT);
+    } else {
+        pinMode(receivedPinNumber, OUTPUT);
+    }
+
+    Serial.print(receivedMessageId);
+    Serial.print(":OK\n");
+}
+
+/**
+ * command message definition (in addition to basic message definition)
+ * pinNumber
+ * pinType (0 = sensor, 1 = actuator)
+ * pinSignalType (0 = digital, 1 = analog)
+ * valueMultiplier (only if pinSignalType == analog)
+ **/
+void receiveCommandMessage() {
+    receivedPinNumber = receivedMessagePart-1;
+    ++receivedMessagePart;
+    ++receivedMessagePart;
+    receivedPinType = receivedMessagePart-1;
+    ++receivedMessagePart;
+    ++receivedMessagePart;
+    receivedPinSignalType = receivedMessagePart-1;
+
+    if(receivedPinType == 0) {
+        //sensor pin
+        if(receivedPinSignalType == 0) {
+            //digital
+            Serial.print(receivedMessageId);
+            Serial.print(':');
+            Serial.print(digitalRead(receivedPinNumber));
+            Serial.print('\n');
+        } else {
+            //analog
+            Serial.print(receivedMessageId);
+            Serial.print(':');
+            Serial.print(analogRead(receivedPinNumber));
+            Serial.print('\n');
+        }
+    } else {
+        //actuator pin
+        ++receivedMessagePart;
+        ++receivedMessagePart;
+        receivedValue = atoi(receivedMessagePart);
+
+        if(receivedPinSignalType == 0) {
+            //digital
+            digitalWrite(receivedPinNumber, receivedValue > 0 ? HIGH : LOW);
+        } else {
+            //analog
+            analogWrite(receivedPinNumber, receivedValue);
+        }
+
+        Serial.print(receivedMessageId);
+        Serial.print(":OK\n");
     }
 }
 

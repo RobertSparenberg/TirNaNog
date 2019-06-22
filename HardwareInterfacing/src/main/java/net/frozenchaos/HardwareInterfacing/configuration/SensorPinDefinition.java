@@ -6,25 +6,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class SensorPinDefinition extends PinDefinition {
     private int pollFrequency;
-    private int valueMultiplier;
 
     public SensorPinDefinition() {
     }
 
-    public SensorPinDefinition(int pinNumber, Board board, int valueMultiplier, int pollFrequency) {
+    public SensorPinDefinition(int pinNumber, PinSignalType pinSignalType, Board board, int pollFrequency) {
         super.setPinNumber(pinNumber);
+        super.setPinSignalType(pinSignalType);
         super.setBoard(board);
-        this.valueMultiplier = valueMultiplier;
         this.pollFrequency = pollFrequency;
-    }
-
-    @XmlElement
-    public int getValueMultiplier() {
-        return valueMultiplier;
-    }
-
-    public void setValueMultiplier(int valueMultiplier) {
-        this.valueMultiplier = valueMultiplier;
     }
 
     @XmlElement
