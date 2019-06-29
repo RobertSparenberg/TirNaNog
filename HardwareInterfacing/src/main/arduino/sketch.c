@@ -21,8 +21,10 @@ const char CONFIG_DONE[] = "DONE";
 const int HANDSHAKE_INIT_BROADCAST_DELAY = 1000;
 int delayUntilHandshakeBroadcast = HANDSHAKE_INIT_BROADCAST_DELAY;
 
+unsigned long currentMillis;
 unsigned long previousTimeMillis = 0;
 unsigned int delta = 0;
+byte status = 0;
 
 // MESSAGING RELATED VARIABLES //
 char receivedMessage[64];
@@ -50,40 +52,37 @@ void setup() {
 }
 
 void loop() {
-    receiveMessages();
+    receiveFromSerial();
     updateTime();
 
     if(status < 3) {
-        if(status & 1 == 0) {
-            requestSync();
-        }
-        if(status & 2 == 0) {
-            acceptSync();
-        }
-    } else {
+        sync();
+    } else if(status == 3 && messageReady) {
         receiveMessage();
     }
 
-    //set the flag to false; don't process a message more than once
-    messageReady = false;
-}
-
-void requestSync() {
-    if(messageReady && receivedMessage == HANDSHAKE_ACCEPT) {
-        status += 2;
-    } else {
-        delayUntilHandshakeBroadcast += delta;
-        if(delayUntilHandshakeBroadcast >= HANDSHAKE_INIT_BROADCAST_DELAY) {
-            Serial.print(HANDSHAKE_INIT);
-            delayUntilHandshakeBroadcast = 0;
-        }
+    if(messageReady) {
+        resetMessage();
     }
 }
 
-void acceptSync() {
-    if(messageReady && receivedMessage == HANDSHAKE_INIT) {
-        sendMessage(HANDSHAKE_ACCEPT);
-        status += 1;
+void sync() {
+    if(status != 1) {
+        if(messageReady && strcmp(receivedMessage, HANDSHAKE_ACCEPT) == 0) {
+            status += 1;
+        } else {
+            delayUntilHandshakeBroadcast += delta;
+            if(delayUntilHandshakeBroadcast >= HANDSHAKE_INIT_BROADCAST_DELAY) {
+                Serial.print(HANDSHAKE_INIT);
+                delayUntilHandshakeBroadcast = 0;
+            }
+        }
+    }
+    
+    if(messageReady && status != 2 && strcmp(receivedMessage, HANDSHAKE_INIT) == 0) {
+        Serial.print(HANDSHAKE_ACCEPT);
+        Serial.print(MESSAGE_END);
+        status += 2;
     }
 }
 
@@ -96,23 +95,28 @@ void acceptSync() {
  **/
 void receiveMessage() {
     if(messageReady) {
-        receivedMessageId = strtol(receivedMessage, receivedMessagePart, 10);
+        receivedMessageId = strtol(receivedMessage, &receivedMessagePart, 10);
         if(receivedMessageId > lastMessageId) {
             lastMessageId = receivedMessageId;
             ++receivedMessagePart;
-
-            receivedMessageType = receivedMessagePart-1;
+            receivedMessageType = *receivedMessagePart;
             ++receivedMessagePart;
             ++receivedMessagePart;
 
-            if(receivedMessageType == 0) {
+            if(receivedMessageType == '0') {
                 receiveConfigMessage();
-            } else if(receivedMessageType == 1) {
+            } else if(receivedMessageType == '1') {
                 receiveCommandMessage();
             }
+        } else {
+          Serial.print(receivedMessageId);
+          Serial.print(":OLD:");
+          Serial.print(lastMessageId + 1);
+          Serial.print("\n");
         }
     }
 }
+
 
 /**
  * config message definition (in addition to basic message definition):
@@ -120,10 +124,12 @@ void receiveMessage() {
  * pinType (0 = sensor, 1 = actuator)
  **/
 void receiveConfigMessage() {
-    receivedPinNumber = receivedMessagePart-1;
+    Serial.print("config message\n");
+  
+    receivedPinNumber = *receivedMessagePart;
     ++receivedMessagePart;
     ++receivedMessagePart;
-    receivedPinType = receivedMessagePart-1;
+    receivedPinType = *receivedMessagePart;
 
     if(receivedPinType == 0) {
         pinMode(receivedPinNumber, INPUT);
@@ -132,7 +138,7 @@ void receiveConfigMessage() {
     }
 
     Serial.print(receivedMessageId);
-    Serial.print(":OK\n");
+    Serial.print(MESSAGE_SEPARATOR + "OK" + MESSAGE_END);
 }
 
 /**
@@ -143,10 +149,12 @@ void receiveConfigMessage() {
  * valueMultiplier (only if pinSignalType == analog)
  **/
 void receiveCommandMessage() {
-    receivedPinNumber = receivedMessagePart-1;
+    Serial.print("command message\n");
+    
+    receivedPinNumber = *receivedMessagePart;
     ++receivedMessagePart;
     ++receivedMessagePart;
-    receivedPinType = receivedMessagePart-1;
+    receivedPinType = *receivedMessagePart;
     ++receivedMessagePart;
     ++receivedMessagePart;
     receivedPinSignalType = receivedMessagePart-1;
@@ -156,15 +164,15 @@ void receiveCommandMessage() {
         if(receivedPinSignalType == 0) {
             //digital
             Serial.print(receivedMessageId);
-            Serial.print(':');
+            Serial.print(MESSAGE_SEPARATOR);
             Serial.print(digitalRead(receivedPinNumber));
-            Serial.print('\n');
+            Serial.print(MESSAGE_END);
         } else {
             //analog
             Serial.print(receivedMessageId);
-            Serial.print(':');
+            Serial.print(MESSAGE_SEPARATOR);
             Serial.print(analogRead(receivedPinNumber));
-            Serial.print('\n');
+            Serial.print(MESSAGE_END);
         }
     } else {
         //actuator pin
@@ -181,19 +189,25 @@ void receiveCommandMessage() {
         }
 
         Serial.print(receivedMessageId);
-        Serial.print(":OK\n");
+        Serial.print(MESSAGE_SEPARATOR + "OK" + MESSAGE_END);
     }
 }
 
-void receiveMessages() {
+void receiveFromSerial() {
     while (Serial.available() > 0) {
         receivedChar = Serial.read();
         if(receivedChar == MESSAGE_END) {
-            if(status >= 3 && receivedMessage == HANDSHAKE_INIT) {
+            if(status >= 3 && strcmp(receivedMessage, HANDSHAKE_INIT) == 0) {
                 reset();
+                return;
             } else {
                 messageReady = true;
             }
+            Serial.print("message receieved (");
+            Serial.print(receivedMessageIndex);
+            Serial.print(") -");
+            Serial.print(receivedMessage);
+            Serial.print("-\n");
             receivedMessage[receivedMessageIndex] = '\0';
             receivedMessageIndex = 0;
         } else {
@@ -203,25 +217,25 @@ void receiveMessages() {
     }
 }
 
-void sendMessage(char[] message) {
-    Serial.print(message);
-    Serial.print(MESSAGE_END);
+void updateTime() {
+    currentMillis = millis();
+    if(previousTimeMillis > currentMillis) {
+        //overflow situation; grab the remainder off of the max unsigned long value and add the overflow
+        delta = (4294967295 - previousTimeMillis) + currentMillis;
+    } else {
+        delta = currentMillis - previousTimeMillis;
+    }
+    previousTimeMillis = currentMillis;
 }
 
-void updateTime() {
-    unsigned long millis = millis();
-    if(previousTimeMillis > millis) {
-        //overflow situation; grab the remainder off of the max unsigned long value and add the overflow
-        delta = (4294967295 - previousTimeMillis) + millis;
-    } else {
-        delta = millis - previousTimeMillis;
-    }
-    previousTimeMillis = millis;
+void resetMessage() {
+    messageReady = false;
+    receivedMessageIndex = 0;
+    receivedMessage[0] = '\0';
 }
 
 void reset() {
     status = 0;
-    configReady = false;
-    configDone = false;
     lastMessageId = 0;
+    resetMessage();
 }
