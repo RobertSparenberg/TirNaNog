@@ -90,6 +90,7 @@ void sync() {
 /**
  * base message definition:
  * messageId
+ * separator ":"
  * messageType (0 = config, 1 = command)
  * other values are type specific
  **/
@@ -102,6 +103,11 @@ void receiveMessage() {
             receivedMessageType = *receivedMessagePart;
             ++receivedMessagePart;
             ++receivedMessagePart;
+
+            Serial.print("messageId: ");
+            Serial.println(receivedMessageId);
+            Serial.print("messageType: ");
+            Serial.println(receivedMessageType);
 
             if(receivedMessageType == '0') {
                 receiveConfigMessage();
@@ -124,14 +130,19 @@ void receiveMessage() {
  * pinType (0 = sensor, 1 = actuator)
  **/
 void receiveConfigMessage() {
-    Serial.print("config message\n");
-  
-    receivedPinNumber = *receivedMessagePart;
-    ++receivedMessagePart;
+    Serial.println("config message");
+    
+    receivedPinNumber = (int)strtol(receivedMessagePart, &receivedMessagePart, 10);
+    Serial.print("pin number: ");
+    Serial.println(receivedPinNumber);
+    //receivedPinNumber = *receivedMessagePart;
+    //++receivedMessagePart;
     ++receivedMessagePart;
     receivedPinType = *receivedMessagePart;
+    Serial.print("pin type: ");
+    Serial.println(receivedPinType);
 
-    if(receivedPinType == 0) {
+    if(receivedPinType == '0') {
         pinMode(receivedPinNumber, INPUT);
     } else {
         pinMode(receivedPinNumber, OUTPUT);
@@ -151,17 +162,25 @@ void receiveConfigMessage() {
 void receiveCommandMessage() {
     Serial.print("command message\n");
     
-    receivedPinNumber = *receivedMessagePart;
-    ++receivedMessagePart;
+    receivedPinNumber = (int)strtol(receivedMessagePart, &receivedMessagePart, 10);
+    Serial.print("pin number: ");
+    Serial.println(receivedPinNumber);
+    //receivedPinNumber = *receivedMessagePart;
+    //++receivedMessagePart;
     ++receivedMessagePart;
     receivedPinType = *receivedMessagePart;
     ++receivedMessagePart;
     ++receivedMessagePart;
-    receivedPinSignalType = receivedMessagePart-1;
+    receivedPinSignalType = *receivedMessagePart;
 
-    if(receivedPinType == 0) {
+    Serial.print("pin type: ");
+    Serial.println(receivedPinType);
+    Serial.print("signal type: ");
+    Serial.println(receivedPinSignalType);
+
+    if(receivedPinType == '0') {
         //sensor pin
-        if(receivedPinSignalType == 0) {
+        if(receivedPinSignalType == '0') {
             //digital
             Serial.print(receivedMessageId);
             Serial.print(MESSAGE_SEPARATOR);
@@ -179,8 +198,11 @@ void receiveCommandMessage() {
         ++receivedMessagePart;
         ++receivedMessagePart;
         receivedValue = atoi(receivedMessagePart);
+        
+        Serial.print("actuator value: ");
+        Serial.println(receivedValue);
 
-        if(receivedPinSignalType == 0) {
+        if(receivedPinSignalType == '0') {
             //digital
             digitalWrite(receivedPinNumber, receivedValue > 0 ? HIGH : LOW);
         } else {
@@ -207,7 +229,7 @@ void receiveFromSerial() {
             Serial.print(receivedMessageIndex);
             Serial.print(") -");
             Serial.print(receivedMessage);
-            Serial.print("-\n");
+            Serial.println("-");
             receivedMessage[receivedMessageIndex] = '\0';
             receivedMessageIndex = 0;
         } else {
@@ -231,7 +253,9 @@ void updateTime() {
 void resetMessage() {
     messageReady = false;
     receivedMessageIndex = 0;
-    receivedMessage[0] = '\0';
+    for(int i = 0; i < 64; i++) {
+        receivedMessage[i] = '\0';
+    }
 }
 
 void reset() {
