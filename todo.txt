@@ -1,9 +1,9 @@
 Todo list:
+- junit coverage
 - cascade updates of the main TirNaNog jar and DB scripts
 - DB script update mechanism (liquibase integrates with spring boot)
 - settings propagation throughout the system
 - pull timer and other utils out into its own utils project to be used as a dependency in the TirNaNog core and capability projects
-- specific CatCoop logic
 
 
 TirNaNog Capability functionality:

@@ -40,6 +40,7 @@ public class BroadcasterTest {
 
         //given
         String name = "BroadcasterTest_testBroadcast";
+        when(ownConfigService.getOwnConfig()).thenReturn(new ModuleConfig(name, "127.0.0.1", false));
         String[] triggerQualifiers = {name + ".Test.TestTrigger1", "OtherName.Test.TestTrigger2", "OtherName.Test.DifferentName"};
         when(triggerRepository.findAll()).thenReturn(CreateTriggers(triggerQualifiers));
         ArgumentCaptor<ScheduledTask> taskCaptor = ArgumentCaptor.forClass(ScheduledTask.class);

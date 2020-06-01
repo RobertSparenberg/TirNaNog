@@ -24,7 +24,7 @@ public class ModuleConfigRepository {
     public ModuleConfigRepository(Timer timer, TirNaNogProperties properties) {
         this.timer = timer;
         try {
-            moduleKeepCachedTime = Integer.valueOf(properties.getProperty(MODULE_KEEP_CACHED_TIME_PROPERTY));
+            moduleKeepCachedTime = Integer.parseInt(properties.getProperty(MODULE_KEEP_CACHED_TIME_PROPERTY));
         } catch(NumberFormatException ignored) {
             moduleKeepCachedTime = MODULE_KEEP_CACHED_TIME;
         }
