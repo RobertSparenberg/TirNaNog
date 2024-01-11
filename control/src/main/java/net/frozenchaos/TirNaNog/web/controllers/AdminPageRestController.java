@@ -60,7 +60,7 @@ public class AdminPageRestController {
                 pageRepository.delete(existingPage);
             }
         }
-        pageRepository.save(newPageList);
+        pageRepository.saveAll(newPageList);
     }
 
     @RequestMapping(value = "/pages/page/views/view/{pageName}", method = RequestMethod.POST)
@@ -69,10 +69,9 @@ public class AdminPageRestController {
         page.setPageOrder(originalPage.getPageOrder());
         pageRepository.delete(originalPage);
         try {
-            Page savedPage = pageRepository.save(page);
-            int i = 0;
+            pageRepository.save(page);
         } catch(Exception e) {
-            logger.error("Error saving page: " + page.toString() + ", exception: " + e.toString());
+            logger.error("Error saving page: " + page + ", exception: " + e);
             pageRepository.save(originalPage);
         }
     }

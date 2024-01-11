@@ -94,7 +94,7 @@ public class ArduinoClient {
      * messageType (0 = config, 1 = command)
      * pinNumber
      * pinType (0 = sensor, 1 = actuator)
-     * pinSignalType (0 = digital, 1 = pwm; pinType = actuator only)
+     * pinSignalType (0 = digital, 1 = pwm; only supplied if pinType == actuator)
      **/
     private void configure() {
         if(pins == null) {
@@ -108,7 +108,7 @@ public class ArduinoClient {
                 receiveMessage(inputStream);
             }
         } catch(IOException e) {
-            logger.error("Error trying to configure Arduino: " + e.toString());
+            logger.error("Error trying to configure Arduino: " + e);
             stop();
         }
 
